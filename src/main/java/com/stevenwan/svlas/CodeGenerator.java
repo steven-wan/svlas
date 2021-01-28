@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
-import com.stevenwan.svlas.entity.BaseEntity;
+import com.stevenwan.svlas.common.BaseEntity;
 
 /**
  * @author steven-wan
@@ -50,7 +50,7 @@ public class CodeGenerator {
         // 全局配置
         GlobalConfig gc = new GlobalConfig();
         gc.setAuthor("steven.wan");
-        gc.setOutputDir(System.getProperty("user.dir")+"/src/main/java");
+        gc.setOutputDir(System.getProperty("user.dir") + "/src/main/java");
         gc.setOpen(false);
         gc.setEntityName("%sEntity");
         gc.setMapperName("%sMapper");

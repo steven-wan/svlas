@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stevenwan.svlas.mapper.StockTradeHistoryFlowMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        code, price_close, price_change, per_price_volatility, total_market_price, turnover, volume, trade_time
+    </sql>
+
+</mapper>

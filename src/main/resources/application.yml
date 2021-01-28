@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://61.164.39.69:41523/stock_steven_wan_dev?useUnicode=true&useSSL=false&characterEncoding=utf8
+    username: root
+    password: jbF2019_13006
+
+
+##ÇëÇóÍøÕ¾
+stock:
+  history-url:
+  time-url:
