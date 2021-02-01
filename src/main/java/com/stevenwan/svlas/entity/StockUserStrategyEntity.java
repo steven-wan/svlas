@@ -28,11 +28,6 @@ public class StockUserStrategyEntity extends BaseEntity {
     private Long userId;
 
     /**
-     * 成本价
-     */
-    private BigDecimal costPrice;
-
-    /**
      * 策略类型 买点，卖出，加仓
      */
     private Integer strategyType;

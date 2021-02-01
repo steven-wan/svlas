@@ -5,7 +5,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        user_id, cost_price, strategy_type, nums, strategy_id, create_time
+        user_id,  strategy_type, nums, strategy_id, create_time
     </sql>
 
 </mapper>

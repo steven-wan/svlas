@@ -97,7 +97,6 @@ CREATE TABLE `stock_user_strategy`
 (
     `id`            bigint(64) NOT NULL COMMENT 'ID',
     `user_id`       bigint(64) NOT NULL COMMENT '用户ID',
-    `cost_price`    decimal(12, 2) DEFAULT NULL COMMENT '成本价',
     `strategy_type` int(10)        DEFAULT NULL COMMENT '策略类型 买点，卖出，加仓',
     `nums`          int(10)        DEFAULT NULL COMMENT '股数',
     `strategy_id`   bigint(64)     DEFAULT NULL COMMENT '策略ID',
@@ -113,7 +112,6 @@ CREATE TABLE `stock_user_strategy_record`
 (
     `id`            bigint(64) NOT NULL COMMENT 'ID',
     `user_id`       bigint(64) NOT NULL COMMENT '用户ID',
-    `cost_price`    decimal(12, 2) DEFAULT NULL COMMENT '成本价',
     `strategy_type` int(10)        DEFAULT NULL COMMENT '策略类型 买点，卖出，加仓',
     `nums`          int(10)        DEFAULT NULL COMMENT '股数',
     `strategy_id`   bigint(64)     DEFAULT NULL COMMENT '策略ID',

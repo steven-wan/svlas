@@ -27,10 +27,6 @@ public class StockUserStrategyRecordEntity extends BaseEntity {
      */
     private Long userId;
 
-    /**
-     * 成本价
-     */
-    private BigDecimal costPrice;
 
     /**
      * 策略类型 买点，卖出，加仓

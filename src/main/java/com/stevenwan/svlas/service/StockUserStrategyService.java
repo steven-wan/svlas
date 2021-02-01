@@ -1,5 +1,6 @@
 package com.stevenwan.svlas.service;
 
+import com.stevenwan.svlas.dto.stock.StockUserStrategyDTO;
 import com.stevenwan.svlas.entity.StockUserStrategyEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface StockUserStrategyService extends IService<StockUserStrategyEntity> {
 
+    /**
+     * 保存用户的股票策略
+     * @param userStrategyDTO
+     * @return
+     */
+    Boolean saveUserStrategy(StockUserStrategyDTO userStrategyDTO);
 }

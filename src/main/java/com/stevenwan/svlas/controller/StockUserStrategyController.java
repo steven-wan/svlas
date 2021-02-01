@@ -1,9 +1,10 @@
 package com.stevenwan.svlas.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import com.stevenwan.svlas.dto.stock.StockUserStrategyDTO;
+import com.stevenwan.svlas.service.StockUserStrategyService;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,8 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-01-28
  */
 @RestController
-@RequestMapping("/stockUserStrategyEntity")
+@RequestMapping("/stockUserStrategy")
+@AllArgsConstructor
 public class StockUserStrategyController {
 
+    private StockUserStrategyService stockUserStrategyService;
+
+    @PostMapping("/addStockUserStrategy")
+    @ResponseBody
+    public Boolean addStockUserStrategy(@RequestBody StockUserStrategyDTO userStrategyDTO) {
+        return stockUserStrategyService.saveUserStrategy(userStrategyDTO);
+    }
 }
 
