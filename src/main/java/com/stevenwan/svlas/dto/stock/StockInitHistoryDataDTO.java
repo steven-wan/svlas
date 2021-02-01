@@ -14,12 +14,12 @@ public class StockInitHistoryDataDTO implements Serializable {
     /**
      * 开始时间
      */
-    private Date startDate;
+    private String startDate;
 
     /**
      * 截至时间
      */
-    private Date endDate;
+    private String endDate;
 
     /**
      * 股票代码

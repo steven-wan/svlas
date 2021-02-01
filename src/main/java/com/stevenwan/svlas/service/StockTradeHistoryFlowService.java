@@ -1,5 +1,6 @@
 package com.stevenwan.svlas.service;
 
+import com.stevenwan.svlas.dto.stock.StockInitHistoryDataDTO;
 import com.stevenwan.svlas.entity.StockTradeHistoryFlowEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface StockTradeHistoryFlowService extends IService<StockTradeHistoryFlowEntity> {
 
+    /**
+     * 初始化股票历史数据
+     * @param initHistoryDataDTO
+     * @return
+     */
+    Boolean initHistoryDataStock(StockInitHistoryDataDTO initHistoryDataDTO);
 }

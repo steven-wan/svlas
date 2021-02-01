@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("stock_trade_history_flow")
-public class StockTradeHistoryFlowEntity extends BaseEntity {
+public class StockTradeHistoryFlowEntity extends BaseEntity  {
 
     private static final long serialVersionUID = 1L;
 

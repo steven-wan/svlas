@@ -1,9 +1,11 @@
 package com.stevenwan.svlas.controller;
 
 
-import com.stevenwan.svlas.dto.stock.StockInitHistoryDataDTO;
+import com.stevenwan.svlas.dto.stock.StockDTO;
+import com.stevenwan.svlas.entity.StockEntity;
 import com.stevenwan.svlas.service.StockService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -15,16 +17,19 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-01-28
  */
 @RestController
-@RequestMapping("/stockEntity")
+@RequestMapping("/stock")
 @AllArgsConstructor
 public class StockController {
 
     private StockService stockService;
 
-    @PostMapping("/initHistoryDataStock")
+    @PostMapping("/addStock")
     @ResponseBody
-    public Boolean initHistoryDataStock(@RequestBody StockInitHistoryDataDTO initHistoryDataDTO){
-        return stockService.initHistoryDataStock(initHistoryDataDTO);
+    public Boolean addStock(@RequestBody StockDTO stockDTO) {
+        StockEntity entity = new StockEntity();
+        BeanUtils.copyProperties(stockDTO, entity);
+        return stockService.save(entity);
     }
+
 }
 

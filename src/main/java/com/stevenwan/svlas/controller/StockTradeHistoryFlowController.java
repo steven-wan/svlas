@@ -1,9 +1,10 @@
 package com.stevenwan.svlas.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import com.stevenwan.svlas.dto.stock.StockInitHistoryDataDTO;
+import com.stevenwan.svlas.service.StockTradeHistoryFlowService;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,8 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-01-28
  */
 @RestController
-@RequestMapping("/stockTradeHistoryFlowEntity")
+@RequestMapping("/stockTradeHistoryFlow")
+@AllArgsConstructor
 public class StockTradeHistoryFlowController {
+    private StockTradeHistoryFlowService stockTradeHistoryFlowService;
 
+    @PostMapping("/initHistoryDataStock")
+    @ResponseBody
+    public Boolean initHistoryDataStock(@RequestBody StockInitHistoryDataDTO initHistoryDataDTO) {
+        return stockTradeHistoryFlowService.initHistoryDataStock(initHistoryDataDTO);
+    }
 }
 

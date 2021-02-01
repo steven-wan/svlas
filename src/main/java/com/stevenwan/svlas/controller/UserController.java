@@ -1,9 +1,12 @@
 package com.stevenwan.svlas.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import com.stevenwan.svlas.dto.user.UserDTO;
+import com.stevenwan.svlas.entity.UserEntity;
+import com.stevenwan.svlas.service.UserService;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,8 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-01-28
  */
 @RestController
-@RequestMapping("/userEntity")
+@RequestMapping("/user")
+@AllArgsConstructor
 public class UserController {
 
+    private UserService userService;
+
+    @PostMapping("/addUser")
+    @ResponseBody
+    public Boolean addUser(@RequestBody UserDTO userDTO) {
+        UserEntity entity = new UserEntity();
+        BeanUtils.copyProperties(userDTO, entity);
+        return userService.save(entity);
+    }
 }
 
