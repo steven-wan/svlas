@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stevenwan.svlas.mapper.NucleicAcidRequestMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        employee_id,  request_time, create_time, request_status
+    </sql>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="nucleicAcidRequestResultMap" type="com.stevenwan.svlas.dto.hsjc.NucleicAcidRequestSelectRetDTO">
+        <result column="id" property="id"/>
+        <result column="idcard_no" property="idcardNo"/>
+        <result column="mobile" property="mobile"/>
+        <result column="company_id" property="companyId"/>
+        <result column="name" property="name"/>
+        <!--        <result column="company_name" property="companyName"/>-->
+        <result column="request_status" property="requestStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="request_time" property="requestTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="selectNucleicAcidRequestList" resultMap="nucleicAcidRequestResultMap">
+        select n.id,
+               e.idcard_no,
+               e.mobile,
+               e.company_id,
+               e.name,
+               n.request_status,
+               n.remark,
+               n.create_time,
+               n.request_time
+        from employee e
+                 JOIN nucleic_acid_request n on e.id = n.employee_id
+        where e.personal_id = #{openId}
+          and n.request_status = #{requestStatus}
+        order by n.create_time desc
+    </select>
+</mapper>

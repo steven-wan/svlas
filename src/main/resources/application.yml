@@ -1,12 +1,30 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://61.164.39.69:41523/stock_steven_wan_dev?useUnicode=true&useSSL=false&characterEncoding=utf8
+    url: jdbc:mysql://61.164.39.69:41523/hsjc?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: jbF2019_13006
-
+  redis:
+    host: localhost
+    port: 6379
 
 ##������վ
 stock:
   history-url: http://quotes.money.163.com/service/chddata.html?code=CODE&start=START&end=END&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP
   time-url: https://qt.gtimg.cn/?q=
+
+
+applet:
+  app-id: wxbe9e0aa2e7c5d9de
+  app-secret: 43736aeda62fff1fa81bdab84c32cc94
+
+mybatis-plus:
+  mapper-locations: classpath*:com/stevenwan/svlas/mapper/xml/*Mapper.xml
+
+
+sms:
+  sendUrl: http://api.hspaas.cn:8080/sms/send
+  balanceUrl: http://api.hspaas.cn:8080/sms/balance
+  appkey: hsENTvhCOwZNs
+  password: e81c73f5ecbf38bc6e297a73a2fc377b
+  content: 【联兴云医】您的验证码为xxxx，如非本人发送请忽略。
