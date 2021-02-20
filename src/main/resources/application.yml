@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://61.164.39.69:41523/hsjc?useUnicode=true&useSSL=false&characterEncoding=utf8
+    username: root
+    password: jbF2019_13006
+  mybatis-plus:
+    mapper-locations: classpath*:com/stevenwan/svlas/mapper/xml/*Mapper.xml
