@@ -1,12 +1,22 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://61.164.39.69:41523/hsjc?useUnicode=true&useSSL=false&characterEncoding=utf8
+    url: jdbc:mysql://61.164.39.69:41523/stock_steven_wan_dev?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: jbF2019_13006
   redis:
-    host: localhost
+    host: 172.16.104.91
     port: 6379
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      scheduler:
+        instanceName: MyScheduler
+      threadPool:
+        threadCount: 3
+
 
 ##������վ
 stock:

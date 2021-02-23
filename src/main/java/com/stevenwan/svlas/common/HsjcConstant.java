@@ -36,4 +36,51 @@ public class HsjcConstant {
      * 返回给前端申请状态 1 可以申请，0 不能申请
      */
     public static Integer VIEW_NUCLEIC_ACID_REQUEST_STATUS_NO = 0;
+
+    /**
+     * 触发器类型： 0 - simple  1 - cron
+     */
+    public static Integer TRIGGER_TYPE_SIMPLE = 0;
+
+    /**
+     * 触发器类型： 0 - simple  1 - cron
+     */
+    public static  Integer TRIGGER_TYPE_CRON = 1;
+
+
+    /**
+     * simple 触发器时间间隔类型： 1 - seconds 2 - milliseconds  3 - minutes  4 - hours
+     */
+    public static final String SIMPLE_INTERVAL_TIME_TYPE_SECONDS = "1";
+
+    /**
+     * simple 触发器时间间隔类型： 1 - seconds 2 - milliseconds  3 - minutes  4 - hours
+     */
+    public static final String SIMPLE_INTERVAL_TIME_TYPE_MILLISECONDS = "2";
+
+    /**
+     * simple 触发器时间间隔类型： 1 - seconds 2 - milliseconds  3 - minutes  4 - hours
+     */
+    public static final String SIMPLE_INTERVAL_TIME_TYPE_MINUTES = "3";
+
+    /**
+     * simple 触发器时间间隔类型： 1 - seconds 2 - milliseconds  3 - minutes  4 - hours
+     */
+    public static final String SIMPLE_INTERVAL_TIME_TYPE_HOURS = "4";
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已删除  2 - 暂停
+     */
+    public static Integer JOB_STATUS_EXCUTING = 0;
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已删除  2 - 暂停
+     */
+    public static Integer JOB_STATUS_DELETE = 1;
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已删除  2 - 暂停
+     */
+    public static Integer JOB_STATUS_PAUSE = 2;
+
 }
