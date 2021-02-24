@@ -64,7 +64,7 @@ public class QuartzSchedulerJobsEntity extends BaseEntity {
     /**
      * simple 触发器时间间隔类型：1 - seconds 2 - milliseconds  3 - minutes  4 - hours
      */
-    private Integer simpleIntervalTimeType;
+    private String simpleIntervalTimeType;
 
     /**
      * 创建时间

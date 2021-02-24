@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.common.HsjcConstant;
 import com.stevenwan.svlas.common.QuartzTimeJob;
 import com.stevenwan.svlas.dto.stock.QuartzAddJobDTO;
+import com.stevenwan.svlas.dto.stock.QuartzUpdateJobDTO;
 import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 import com.stevenwan.svlas.mapper.QuartzSchedulerJobsMapper;
 import com.stevenwan.svlas.service.QuartzSchedulerJobsService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.QuartzJobsUtils;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,8 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
 
     @Override
     public Boolean addTimesJob(QuartzAddJobDTO quartzAddJobDTO) {
-        checkParams(quartzAddJobDTO);
+        checkParams(quartzAddJobDTO.getTriggerType(), quartzAddJobDTO.getCornExpression(), quartzAddJobDTO.getSimpleIntervalTimeType(),
+                quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleRepeatNums());
 
         QuartzSchedulerJobsEntity jobsEntity = new QuartzSchedulerJobsEntity();
         BeanUtil.copyProperties(quartzAddJobDTO, jobsEntity);
@@ -42,7 +46,7 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
         jobsEntity.setStatus(HsjcConstant.JOB_STATUS_EXCUTING);
         save(jobsEntity);
 
-        Scheduler scheduler = schedulerFactoryBean.getScheduler();
+        Scheduler scheduler = getScheduler();
         if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzAddJobDTO.getTriggerType())) {
             QuartzJobsUtils.startJobWithCronTrigger(scheduler, QuartzTimeJob.class, quartzAddJobDTO.getJobName(),
                     quartzAddJobDTO.getJobGroupName(), quartzAddJobDTO.getCornExpression());
@@ -60,15 +64,88 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
         return Boolean.TRUE;
     }
 
+    private Scheduler getScheduler() {
+        return schedulerFactoryBean.getScheduler();
+    }
 
-    private void checkParams(QuartzAddJobDTO quartzAddJobDTO) {
-        ObjectUtils.isNullThrowsExcetion(quartzAddJobDTO.getTriggerType(), "triggerType is null");
-        if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzAddJobDTO.getTriggerType())) {
-            ObjectUtils.isNullThrowsExcetion(quartzAddJobDTO.getCornExpression(), "cornExpression is null");
+    @Override
+    public Boolean deleteTimesJob(Long jobId, Long userId) {
+        QuartzSchedulerJobsEntity jobsEntity = getQuartzSchedulerJobsEntityById(jobId);
+        Scheduler scheduler = getScheduler();
+        JobKey jobKey = new JobKey(jobsEntity.getJobName(), jobsEntity.getJobGroupName());
+        try {
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+            if (ObjectUtils.isNotNull(jobDetail)) {
+                scheduler.deleteJob(jobKey);
+
+                jobsEntity.setUpdateTime(DateUtil.date());
+                jobsEntity.setUpdateUser(userId);
+                jobsEntity.setStatus(HsjcConstant.JOB_STATUS_DELETE);
+                updateById(jobsEntity);
+            }
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean updateTimesJob(QuartzUpdateJobDTO quartzUpdateJobDTO) {
+        checkParams(quartzUpdateJobDTO.getTriggerType(), quartzUpdateJobDTO.getCornExpression(), quartzUpdateJobDTO.getSimpleIntervalTimeType(),
+                quartzUpdateJobDTO.getSimpleIntervalTime(), quartzUpdateJobDTO.getSimpleRepeatNums());
+
+        QuartzSchedulerJobsEntity jobsEntity = getQuartzSchedulerJobsEntityById(quartzUpdateJobDTO.getJobId());
+        Scheduler scheduler = getScheduler();
+        if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzUpdateJobDTO.getTriggerType())) {
+            if (!jobsEntity.getCornExpression().equalsIgnoreCase(quartzUpdateJobDTO.getCornExpression())) {
+                QuartzJobsUtils.updateJobWithCronTrigger(scheduler, jobsEntity.getJobName(),
+                        jobsEntity.getJobGroupName(), quartzUpdateJobDTO.getCornExpression());
+
+                jobsEntity.setUpdateTime(DateUtil.date());
+                jobsEntity.setUpdateUser(quartzUpdateJobDTO.getUserId());
+                jobsEntity.setCornExpression(quartzUpdateJobDTO.getCornExpression());
+                updateById(jobsEntity);
+            }
         } else {
-            ObjectUtils.isNullThrowsExcetion(quartzAddJobDTO.getSimpleIntervalTimeType(), "simpleIntervalTimeType is null");
-            ObjectUtils.isNullThrowsExcetion(quartzAddJobDTO.getSimpleIntervalTime(), "simpleIntervalTime is null");
-            ObjectUtils.isNullThrowsExcetion(quartzAddJobDTO.getSimpleRepeatNums(), "simpleRepeatNums is null");
+
+            if (!jobsEntity.getSimpleIntervalTimeType().equals(quartzUpdateJobDTO.getSimpleIntervalTimeType()) ||
+                    !jobsEntity.getSimpleIntervalTime().equals(quartzUpdateJobDTO.getSimpleIntervalTime()) ||
+                    !jobsEntity.getSimpleRepeatNums().equals(quartzUpdateJobDTO.getSimpleRepeatNums())) {
+
+                QuartzJobsUtils.updateJobWithSimpleTrigger(scheduler, jobsEntity.getJobName(), jobsEntity.getJobGroupName(),
+                        quartzUpdateJobDTO.getSimpleIntervalTimeType(), quartzUpdateJobDTO.getSimpleIntervalTime(), quartzUpdateJobDTO.getSimpleRepeatNums());
+
+                jobsEntity.setUpdateTime(DateUtil.date());
+                jobsEntity.setUpdateUser(quartzUpdateJobDTO.getUserId());
+                jobsEntity.setSimpleIntervalTime(quartzUpdateJobDTO.getSimpleIntervalTime());
+                jobsEntity.setSimpleIntervalTimeType(quartzUpdateJobDTO.getSimpleIntervalTimeType());
+                jobsEntity.setSimpleRepeatNums(quartzUpdateJobDTO.getSimpleRepeatNums());
+
+                updateById(jobsEntity);
+            }
+        }
+
+
+        return Boolean.TRUE;
+    }
+
+    private QuartzSchedulerJobsEntity getQuartzSchedulerJobsEntityById(Long jobId) {
+        QuartzSchedulerJobsEntity jobsEntity = baseMapper.findByIdAndStatus(jobId, HsjcConstant.JOB_STATUS_EXCUTING);
+        ObjectUtils.isNullThrowsExcetion(jobsEntity, "错误的 jobId");
+        return jobsEntity;
+    }
+
+
+    private void checkParams(Integer triggerType, String cornExpression, String simpleIntervalTimeType, Integer simpleIntervalTime, Integer simpleRepeatNums) {
+        ObjectUtils.isNullThrowsExcetion(triggerType, "triggerType is null");
+        if (HsjcConstant.TRIGGER_TYPE_CRON.equals(triggerType)) {
+            ObjectUtils.isNullThrowsExcetion(cornExpression, "cornExpression is null");
+        } else {
+            ObjectUtils.isNullThrowsExcetion(simpleIntervalTimeType, "simpleIntervalTimeType is null");
+            ObjectUtils.isNullThrowsExcetion(simpleIntervalTime, "simpleIntervalTime is null");
+            ObjectUtils.isNullThrowsExcetion(simpleRepeatNums, "simpleRepeatNums is null");
         }
 
     }

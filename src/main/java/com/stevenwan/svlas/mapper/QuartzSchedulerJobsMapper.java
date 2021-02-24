@@ -1,7 +1,9 @@
 package com.stevenwan.svlas.mapper;
 
-import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface QuartzSchedulerJobsMapper extends BaseMapper<QuartzSchedulerJobsEntity> {
 
+    @Select("select * from quartz_scheduler_jobs where id=#{jobId} and status=#{jobStatus}")
+    QuartzSchedulerJobsEntity findByIdAndStatus(@Param("jobId") Long jobId, @Param("jobStatus") Integer jobStatus);
 }

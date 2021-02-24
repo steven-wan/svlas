@@ -10,8 +10,10 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @date 2021-02-23 16:40
  */
 public class QuartzTimeJob extends QuartzJobBean {
+
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
+        System.out.println("打印测试数据");
     }
 }

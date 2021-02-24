@@ -11,24 +11,13 @@ import javax.validation.constraints.NotNull;
  * @date 2021-02-23 16:09
  */
 @Data
-public class QuartzAddJobDTO {
+public class QuartzUpdateJobDTO {
     /**
-     * 任务名称
+     * job Id
      */
-    @NotBlank(message = "jobName is null")
-    private String jobName;
+    @NotNull(message = "jobId is null")
+    private Long jobId;
 
-    /**
-     * 任务所属组名称
-     */
-    @NotBlank(message = "jobGroupName is null")
-    private String jobGroupName;
-
-    /**
-     * 任务描述
-     */
-    @NotBlank(message = "jobDesc is null")
-    private String jobDesc;
 
     /**
      * 触发器类型： 0 - simple  1 - cron

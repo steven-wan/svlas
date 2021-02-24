@@ -75,7 +75,31 @@ public class QuartzJobsUtils {
         }
     }
 
+    public static void updateJobWithCronTrigger(Scheduler scheduler, String jobName, String jobGroupName,
+                                                String cornExpression) {
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withSchedule(cronSchedule(cornExpression)).withIdentity(jobName, jobGroupName).build();
+        TriggerKey triggerKey = new TriggerKey(jobName, jobGroupName);
+        try {
+            scheduler.rescheduleJob(triggerKey, cronTrigger);
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName) {
         return JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
+    }
+
+    public static void updateJobWithSimpleTrigger(Scheduler scheduler, String jobName, String jobGroupName, String simpleIntervalTimeType,
+                                                  Integer simpleIntervalTime, Integer simpleRepeatNums) {
+        TriggerKey triggerKey = new TriggerKey(jobName, jobGroupName);
+
+        SimpleTrigger trigger = newTrigger().withIdentity(jobName, jobGroupName)
+                .withSchedule(getSimpleSchedBuilder(simpleIntervalTime, simpleIntervalTimeType, simpleRepeatNums)).build();
+        try {
+            scheduler.rescheduleJob(triggerKey, trigger);
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
