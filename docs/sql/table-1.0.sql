@@ -38,6 +38,7 @@ CREATE TABLE `user`
     `sex`         int(2)      DEFAULT NULL COMMENT '性别 男，女',
     `name`        varchar(50) DEFAULT NULL COMMENT '姓名',
     `mobile`      varchar(15) DEFAULT NULL COMMENT '电话',
+    `mail_address`      varchar(50) DEFAULT NULL COMMENT '邮件地址',
     `create_time` datetime    DEFAULT NULL COMMENT '创建时间',
     `update_user` bigint(64)  DEFAULT NULL COMMENT '修改人',
     `update_time` datetime    DEFAULT NULL COMMENT '修改时间',

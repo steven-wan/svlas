@@ -1,10 +1,13 @@
 package com.stevenwan.svlas.service.impl;
 
+import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import com.stevenwan.svlas.entity.StockStrategyEntity;
 import com.stevenwan.svlas.mapper.StockStrategyMapper;
 import com.stevenwan.svlas.service.StockStrategyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class StockStrategyServiceImpl extends ServiceImpl<StockStrategyMapper, StockStrategyEntity> implements StockStrategyService {
 
+    @Override
+    public List<StockStrategyJobDTO> findByUserId(Long userId) {
+        return baseMapper.selectStockStrategyJobList(userId);
+    }
 }

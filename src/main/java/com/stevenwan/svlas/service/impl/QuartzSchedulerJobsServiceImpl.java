@@ -5,11 +5,14 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.common.HsjcConstant;
 import com.stevenwan.svlas.common.QuartzTimeJob;
+import com.stevenwan.svlas.config.StockConfig;
 import com.stevenwan.svlas.dto.stock.QuartzAddJobDTO;
 import com.stevenwan.svlas.dto.stock.QuartzUpdateJobDTO;
+import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 import com.stevenwan.svlas.mapper.QuartzSchedulerJobsMapper;
 import com.stevenwan.svlas.service.QuartzSchedulerJobsService;
+import com.stevenwan.svlas.service.StockStrategyService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.QuartzJobsUtils;
 import org.quartz.JobDetail;
@@ -19,6 +22,8 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -34,25 +39,32 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
     @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
 
+    @Autowired
+    private StockStrategyService stockStrategyService;
+
+    @Autowired
+    private StockConfig stockConfig;
+
     @Override
     public Boolean addTimesJob(QuartzAddJobDTO quartzAddJobDTO) {
         checkParams(quartzAddJobDTO.getTriggerType(), quartzAddJobDTO.getCornExpression(), quartzAddJobDTO.getSimpleIntervalTimeType(),
                 quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleRepeatNums());
 
         QuartzSchedulerJobsEntity jobsEntity = new QuartzSchedulerJobsEntity();
-        BeanUtil.copyProperties(quartzAddJobDTO, jobsEntity);
+        BeanUtil.copyProperties(quartzAddJobDTO, jobsEntity, new String[]{"id"});
         jobsEntity.setCreateTime(DateUtil.date());
         jobsEntity.setCreateUser(quartzAddJobDTO.getUserId());
         jobsEntity.setStatus(HsjcConstant.JOB_STATUS_EXCUTING);
         save(jobsEntity);
 
+        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(quartzAddJobDTO.getUserId());
         Scheduler scheduler = getScheduler();
         if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzAddJobDTO.getTriggerType())) {
             QuartzJobsUtils.startJobWithCronTrigger(scheduler, QuartzTimeJob.class, quartzAddJobDTO.getJobName(),
-                    quartzAddJobDTO.getJobGroupName(), quartzAddJobDTO.getCornExpression());
+                    quartzAddJobDTO.getJobGroupName(), quartzAddJobDTO.getCornExpression(), strategyJobDTOList, stockConfig.getTencentTimeUrl());
         } else {
             QuartzJobsUtils.startJobWithSimpleTrigger(scheduler, QuartzTimeJob.class, quartzAddJobDTO.getJobName(), quartzAddJobDTO.getJobGroupName(),
-                    quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleIntervalTimeType(), quartzAddJobDTO.getSimpleRepeatNums());
+                    quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleIntervalTimeType(), quartzAddJobDTO.getSimpleRepeatNums(), strategyJobDTOList, stockConfig.getTencentTimeUrl());
         }
 
         try {
@@ -77,12 +89,12 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 
             if (ObjectUtils.isNotNull(jobDetail)) {
-                scheduler.deleteJob(jobKey);
-
                 jobsEntity.setUpdateTime(DateUtil.date());
                 jobsEntity.setUpdateUser(userId);
                 jobsEntity.setStatus(HsjcConstant.JOB_STATUS_DELETE);
                 updateById(jobsEntity);
+
+                scheduler.deleteJob(jobKey);
             }
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
@@ -100,22 +112,19 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
         Scheduler scheduler = getScheduler();
         if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzUpdateJobDTO.getTriggerType())) {
             if (!jobsEntity.getCornExpression().equalsIgnoreCase(quartzUpdateJobDTO.getCornExpression())) {
-                QuartzJobsUtils.updateJobWithCronTrigger(scheduler, jobsEntity.getJobName(),
-                        jobsEntity.getJobGroupName(), quartzUpdateJobDTO.getCornExpression());
-
                 jobsEntity.setUpdateTime(DateUtil.date());
                 jobsEntity.setUpdateUser(quartzUpdateJobDTO.getUserId());
                 jobsEntity.setCornExpression(quartzUpdateJobDTO.getCornExpression());
                 updateById(jobsEntity);
+
+                QuartzJobsUtils.updateJobWithCronTrigger(scheduler, jobsEntity.getJobName(),
+                        jobsEntity.getJobGroupName(), quartzUpdateJobDTO.getCornExpression());
             }
         } else {
 
             if (!jobsEntity.getSimpleIntervalTimeType().equals(quartzUpdateJobDTO.getSimpleIntervalTimeType()) ||
                     !jobsEntity.getSimpleIntervalTime().equals(quartzUpdateJobDTO.getSimpleIntervalTime()) ||
                     !jobsEntity.getSimpleRepeatNums().equals(quartzUpdateJobDTO.getSimpleRepeatNums())) {
-
-                QuartzJobsUtils.updateJobWithSimpleTrigger(scheduler, jobsEntity.getJobName(), jobsEntity.getJobGroupName(),
-                        quartzUpdateJobDTO.getSimpleIntervalTimeType(), quartzUpdateJobDTO.getSimpleIntervalTime(), quartzUpdateJobDTO.getSimpleRepeatNums());
 
                 jobsEntity.setUpdateTime(DateUtil.date());
                 jobsEntity.setUpdateUser(quartzUpdateJobDTO.getUserId());
@@ -124,6 +133,10 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
                 jobsEntity.setSimpleRepeatNums(quartzUpdateJobDTO.getSimpleRepeatNums());
 
                 updateById(jobsEntity);
+
+                QuartzJobsUtils.updateJobWithSimpleTrigger(scheduler, jobsEntity.getJobName(), jobsEntity.getJobGroupName(),
+                        quartzUpdateJobDTO.getSimpleIntervalTimeType(), quartzUpdateJobDTO.getSimpleIntervalTime(), quartzUpdateJobDTO.getSimpleRepeatNums());
+
             }
         }
 

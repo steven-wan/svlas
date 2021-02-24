@@ -6,9 +6,11 @@ import cn.hutool.core.text.csv.CsvReader;
 import cn.hutool.core.text.csv.CsvUtil;
 import cn.hutool.http.HttpUtil;
 import com.stevenwan.svlas.common.StockCSVModel;
+import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
@@ -55,4 +57,20 @@ public class StockUtils {
         return reader.read(IoUtil.getReader(new ByteArrayInputStream(bytes), Charset.forName("GBK")), StockCSVModel.class);
     }
 
+
+    public static TencentStockModel tencentTimeData(String url, String code) {
+        String responseDatas = HttpUtil.get(url.concat(code));
+
+        String[] strings = responseDatas.split("~");
+        System.out.println(strings[1]);
+        System.out.println(strings[2]);
+        System.out.println(strings[3]);
+        System.out.println(strings[5]);
+        TencentStockModel stockModel = new TencentStockModel();
+        stockModel.setCode(strings[2]);
+        stockModel.setCodeName(strings[1]);
+        stockModel.setPrice(new BigDecimal(strings[3]));
+        stockModel.setPerPriceVolatility(new BigDecimal(strings[5]));
+        return stockModel;
+    }
 }

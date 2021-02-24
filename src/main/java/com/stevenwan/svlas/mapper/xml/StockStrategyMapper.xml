@@ -8,4 +8,32 @@
         code, price_anchor, adjust_time, per_price_volatility, create_time
     </sql>
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="stockStrategyJobResultMap" type="com.stevenwan.svlas.dto.stock.StockStrategyJobDTO">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="price_anchor" property="priceAnchor"/>
+        <result column="adjust_time" property="adjustTime"/>
+        <result column="per_price_volatility" property="perPriceVolatility"/>
+        <result column="mail_address" property="mailAddress"/>
+        <result column="strategy_type" property="strategyType"/>
+        <result column="nums" property="nums"/>
+    </resultMap>
+
+    <select id="selectStockStrategyJobList" resultMap="stockStrategyJobResultMap">
+        SELECT
+            ss.adjust_time,
+            ss.`code`,
+            ss.id,
+            ss.per_price_volatility,
+            ss.price_anchor,
+            u.mail_address,
+            sus.nums,
+            sus.strategy_type
+        FROM stock_strategy ss
+                 JOIN stock_user_strategy sus ON sus.strategy_id=ss.id
+                 JOIN `user` u ON u.id =sus.user_id
+        WHERE u.id= #{userId}
+    </select>
+
 </mapper>

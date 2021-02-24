@@ -13,10 +13,10 @@ public class StockConfig {
     /**
      * 获取历史数据地址
      */
-    private String historyUrl;
+    private String neteaseHistoryUrl;
 
     /**
      * 获取实时数据地址
      */
-    private String timeUrl;
+    private String tencentTimeUrl;
 }

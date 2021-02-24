@@ -43,7 +43,7 @@ public class StockTradeHistoryFlowServiceImpl extends ServiceImpl<StockTradeHist
         );
         ObjectUtils.isNullThrowsExcetion(code, "stock code is not exist");
 
-        List<StockCSVModel> stockCSVModels = StockUtils.stockHistoryDataByNetEase(stockConfig.getHistoryUrl(), code.getCode(), initHistoryDataDTO.getStartDate(), initHistoryDataDTO.getEndDate());
+        List<StockCSVModel> stockCSVModels = StockUtils.stockHistoryDataByNetEase(stockConfig.getNeteaseHistoryUrl(), code.getCode(), initHistoryDataDTO.getStartDate(), initHistoryDataDTO.getEndDate());
 
         if(ObjectUtils.isNotNull(stockCSVModels)){
             List<StockTradeHistoryFlowEntity> historyFlowEntityList = stockCSVModels.stream().map(obj -> {

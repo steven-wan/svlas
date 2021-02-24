@@ -1,7 +1,11 @@
 package com.stevenwan.svlas.util;
 
+import com.alibaba.fastjson.JSON;
 import com.stevenwan.svlas.common.HsjcConstant;
+import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import org.quartz.*;
+
+import java.util.List;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -15,8 +19,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class QuartzJobsUtils {
 
     public static void startJobWithSimpleTrigger(Scheduler scheduler, Class jobClass, String jobName, String jobGroupName,
-                                                 Integer simpleIntervalTime, String simpleIntervalTimeType, Integer simpleRepeatNums) {
-        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName);
+                                                 Integer simpleIntervalTime, String simpleIntervalTimeType, Integer simpleRepeatNums, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
+        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, strategyJobDTOList, url);
         SimpleTrigger trigger = newTrigger().withIdentity(jobName, jobGroupName)
                 .withSchedule(getSimpleSchedBuilder(simpleIntervalTime, simpleIntervalTimeType, simpleRepeatNums)).build();
         try {
@@ -64,11 +68,13 @@ public class QuartzJobsUtils {
     }
 
     public static void startJobWithCronTrigger(Scheduler scheduler, Class jobClass, String jobName, String jobGroupName,
-                                               String cornExpression) {
-        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName);
+                                               String cornExpression, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
+        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, strategyJobDTOList,url);
+
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withSchedule(cronSchedule(cornExpression)).withIdentity(jobName, jobGroupName).build();
 
         try {
+
             scheduler.scheduleJob(jobDetail, cronTrigger);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
@@ -86,8 +92,12 @@ public class QuartzJobsUtils {
         }
     }
 
-    private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName) {
-        return JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
+    private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
+
+        return JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName)
+                .usingJobData("timeJobs", JSON.toJSONString(strategyJobDTOList))
+                .usingJobData("url", url)
+                .build();
     }
 
     public static void updateJobWithSimpleTrigger(Scheduler scheduler, String jobName, String jobGroupName, String simpleIntervalTimeType,
