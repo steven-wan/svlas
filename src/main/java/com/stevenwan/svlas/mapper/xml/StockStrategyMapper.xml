@@ -33,7 +33,7 @@
         FROM stock_strategy ss
                  JOIN stock_user_strategy sus ON sus.strategy_id=ss.id
                  JOIN `user` u ON u.id =sus.user_id
-        WHERE u.id= #{userId}
+        WHERE ss.status = 0 and u.id= #{userId}
     </select>
 
 </mapper>

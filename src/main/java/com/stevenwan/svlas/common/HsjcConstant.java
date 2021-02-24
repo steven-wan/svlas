@@ -83,4 +83,39 @@ public class HsjcConstant {
      */
     public static Integer JOB_STATUS_PAUSE = 2;
 
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已触发
+     */
+    public static Integer STOCK_STRATEGY_STATUS_EXCUTEING = 0;
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已触发
+     */
+    public static Integer STOCK_STRATEGY_STATUS_ACTIVATED = 1;
+
+    /**
+     * 区域 A A股，HK 港股，USA 美股
+     */
+    public static final String STOCK_REGION_A = "A";
+
+    /**
+     * 区域 A A股，HK 港股，USA 美股
+     */
+    public static final String STOCK_REGION_HK = "HK";
+
+    /**
+     * 区域 A A股，HK 港股，USA 美股
+     */
+    public static final String STOCK_REGION_USA = "USA";
+
+    /**
+     * 类型 FUND 基金，STOCK 股票，期货，黄金
+     */
+    public static final String STOCK_TYPE_STOCK = "STOCK";
+
+    /**
+     * 类型 FUND 基金，STOCK 股票，期货，黄金
+     */
+    public static final String STOCK_TYPE_FUND = "FUND";
 }

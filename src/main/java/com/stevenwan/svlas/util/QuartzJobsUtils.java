@@ -1,11 +1,7 @@
 package com.stevenwan.svlas.util;
 
-import com.alibaba.fastjson.JSON;
 import com.stevenwan.svlas.common.HsjcConstant;
-import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import org.quartz.*;
-
-import java.util.List;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -19,8 +15,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class QuartzJobsUtils {
 
     public static void startJobWithSimpleTrigger(Scheduler scheduler, Class jobClass, String jobName, String jobGroupName,
-                                                 Integer simpleIntervalTime, String simpleIntervalTimeType, Integer simpleRepeatNums, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
-        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, strategyJobDTOList, url);
+                                                 Integer simpleIntervalTime, String simpleIntervalTimeType, Integer simpleRepeatNums, Long userId) {
+        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, userId);
         SimpleTrigger trigger = newTrigger().withIdentity(jobName, jobGroupName)
                 .withSchedule(getSimpleSchedBuilder(simpleIntervalTime, simpleIntervalTimeType, simpleRepeatNums)).build();
         try {
@@ -68,8 +64,8 @@ public class QuartzJobsUtils {
     }
 
     public static void startJobWithCronTrigger(Scheduler scheduler, Class jobClass, String jobName, String jobGroupName,
-                                               String cornExpression, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
-        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, strategyJobDTOList,url);
+                                               String cornExpression, Long userId) {
+        JobDetail jobDetail = addJobDetail(jobClass, jobName, jobGroupName, userId);
 
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withSchedule(cronSchedule(cornExpression)).withIdentity(jobName, jobGroupName).build();
 
@@ -92,11 +88,10 @@ public class QuartzJobsUtils {
         }
     }
 
-    private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName, List<StockStrategyJobDTO> strategyJobDTOList, String url) {
+    private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName, Long userId) {
 
         return JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName)
-                .usingJobData("timeJobs", JSON.toJSONString(strategyJobDTOList))
-                .usingJobData("url", url)
+                .usingJobData("userId", userId)
                 .build();
     }
 

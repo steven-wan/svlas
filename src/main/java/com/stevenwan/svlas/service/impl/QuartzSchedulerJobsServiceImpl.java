@@ -5,14 +5,11 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.common.HsjcConstant;
 import com.stevenwan.svlas.common.QuartzTimeJob;
-import com.stevenwan.svlas.config.StockConfig;
 import com.stevenwan.svlas.dto.stock.QuartzAddJobDTO;
 import com.stevenwan.svlas.dto.stock.QuartzUpdateJobDTO;
-import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 import com.stevenwan.svlas.mapper.QuartzSchedulerJobsMapper;
 import com.stevenwan.svlas.service.QuartzSchedulerJobsService;
-import com.stevenwan.svlas.service.StockStrategyService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.QuartzJobsUtils;
 import org.quartz.JobDetail;
@@ -22,8 +19,6 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * <p>
@@ -39,12 +34,6 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
     @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
 
-    @Autowired
-    private StockStrategyService stockStrategyService;
-
-    @Autowired
-    private StockConfig stockConfig;
-
     @Override
     public Boolean addTimesJob(QuartzAddJobDTO quartzAddJobDTO) {
         checkParams(quartzAddJobDTO.getTriggerType(), quartzAddJobDTO.getCornExpression(), quartzAddJobDTO.getSimpleIntervalTimeType(),
@@ -57,14 +46,13 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
         jobsEntity.setStatus(HsjcConstant.JOB_STATUS_EXCUTING);
         save(jobsEntity);
 
-        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(quartzAddJobDTO.getUserId());
         Scheduler scheduler = getScheduler();
         if (HsjcConstant.TRIGGER_TYPE_CRON.equals(quartzAddJobDTO.getTriggerType())) {
             QuartzJobsUtils.startJobWithCronTrigger(scheduler, QuartzTimeJob.class, quartzAddJobDTO.getJobName(),
-                    quartzAddJobDTO.getJobGroupName(), quartzAddJobDTO.getCornExpression(), strategyJobDTOList, stockConfig.getTencentTimeUrl());
+                    quartzAddJobDTO.getJobGroupName(), quartzAddJobDTO.getCornExpression(), quartzAddJobDTO.getUserId());
         } else {
             QuartzJobsUtils.startJobWithSimpleTrigger(scheduler, QuartzTimeJob.class, quartzAddJobDTO.getJobName(), quartzAddJobDTO.getJobGroupName(),
-                    quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleIntervalTimeType(), quartzAddJobDTO.getSimpleRepeatNums(), strategyJobDTOList, stockConfig.getTencentTimeUrl());
+                    quartzAddJobDTO.getSimpleIntervalTime(), quartzAddJobDTO.getSimpleIntervalTimeType(), quartzAddJobDTO.getSimpleRepeatNums(), quartzAddJobDTO.getUserId());
         }
 
         try {

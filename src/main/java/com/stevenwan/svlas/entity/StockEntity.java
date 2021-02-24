@@ -37,14 +37,14 @@ public class StockEntity {
     private Integer industryType;
 
     /**
-     * 类型 基金，股票，期货，黄金
+     * 类型 FUND 基金，STOCK 股票，期货，黄金
      */
-    private Integer type;
+    private String type;
 
     /**
-     * 区域 A股，港股，美股
+     * 区域 A A股，HK 港股，USA 美股
      */
-    private Integer region;
+    private String region;
 
     /**
      * 用户ID

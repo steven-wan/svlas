@@ -47,5 +47,8 @@ public class StockStrategyEntity extends BaseEntity {
      */
     private Date createTime;
 
-
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已触发
+     */
+    private Integer status;
 }

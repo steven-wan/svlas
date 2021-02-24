@@ -4,8 +4,8 @@ CREATE TABLE `stock`
     `code`          varchar(10) NOT NULL COMMENT '股票代码',
     `name`          varchar(100) DEFAULT NULL COMMENT '股票名称',
     `industry_type` int(2)      NOT NULL COMMENT '行业类型',
-    `type`          int(2)       DEFAULT NULL COMMENT '类型 基金，股票，期货，黄金',
-    `region`        int(2)       DEFAULT NULL COMMENT '区域 A股，港股，美股',
+    `type`          varchar(5)       DEFAULT NULL COMMENT '类型 FUND 基金，STOCK 股票，期货，黄金',
+    `region`        varchar(5)       DEFAULT NULL COMMENT '区域 A A股，HK 港股，USA 美股',
     `user_id`       bigint(64)  NOT NULL COMMENT '用户ID',
     `create_time`   datetime     DEFAULT NULL COMMENT '创建时间',
     `update_user`   bigint(64)   DEFAULT NULL COMMENT '修改人',
@@ -67,6 +67,7 @@ CREATE TABLE `stock_user_info`
     `code`         varchar(10) NOT NULL COMMENT '股票代码',
     `user_id`      bigint(64)  NOT NULL COMMENT '用户ID',
     `cost_price`   decimal(12, 2) DEFAULT NULL COMMENT '成本价',
+    `current_price`   decimal(12, 2) DEFAULT NULL COMMENT '当前价',
     `nums`         int(10)        DEFAULT NULL COMMENT '股数',
     `profit_price` decimal(12, 2) DEFAULT NULL COMMENT '盈利额',
     `profit_rate`  decimal(12, 2) DEFAULT NULL COMMENT '收益比例',
@@ -84,6 +85,7 @@ CREATE TABLE `stock_user_info_record`
     `code`         varchar(10) NOT NULL COMMENT '股票代码',
     `user_id`      bigint(64)  NOT NULL COMMENT '用户ID',
     `cost_price`   decimal(12, 2) DEFAULT NULL COMMENT '成本价',
+    `current_price`   decimal(12, 2) DEFAULT NULL COMMENT '当前价',
     `nums`         int(10)        DEFAULT NULL COMMENT '股数',
     `profit_price` decimal(12, 2) DEFAULT NULL COMMENT '盈利额',
     `profit_rate`  decimal(12, 2) DEFAULT NULL COMMENT '收益比例',
@@ -130,6 +132,7 @@ CREATE TABLE `stock_strategy`
     `adjust_time`          datetime       DEFAULT NULL COMMENT '时间：调整日期',
     `per_price_volatility` decimal(4, 2)  DEFAULT NULL COMMENT '空间：回调幅度',
     `create_time`          datetime       DEFAULT NULL COMMENT '创建日期',
+     `status`          int(2)       DEFAULT 0 COMMENT '状态： 0 - 代表正在执行  1 - 已触发',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='股票策略表';
