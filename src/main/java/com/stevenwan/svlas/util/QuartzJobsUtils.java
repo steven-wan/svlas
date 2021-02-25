@@ -91,7 +91,7 @@ public class QuartzJobsUtils {
     private static JobDetail addJobDetail(Class jobClass, String jobName, String jobGroupName, Long userId) {
 
         return JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName)
-                .usingJobData("userId", userId)
+                .usingJobData("userId", userId.toString())
                 .build();
     }
 

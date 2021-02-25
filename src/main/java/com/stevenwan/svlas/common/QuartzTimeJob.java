@@ -42,18 +42,47 @@ public class QuartzTimeJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Long userId = (Long) jobExecutionContext.getJobDetail().getJobDataMap().get("userId");
+        String userId = (String) jobExecutionContext.getJobDetail().getJobDataMap().get("userId");
 
-        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(userId);
+        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(Long.valueOf(userId));
 
         if (CollectionUtil.isNotEmpty(strategyJobDTOList)) {
             strategyJobDTOList.forEach(stockStrategyJobDTO -> {
                 TencentStockModel stockModel = StockUtils.tencentTimeData(stockStrategyJobDTO.getCode(), stockConfig.getTencentTimeUrl());
                 comparseStockStrategy(stockModel, stockStrategyJobDTO);
+                ifDownGt10WarnMail(stockModel, stockStrategyJobDTO.getMailAddress());
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             });
+        }
+
+        System.out.println("打印测试数据");
+    }
+
+    /**
+     * 如果波动大于 10 就发邮件提醒
+     *
+     * @param stockModel
+     */
+    private void ifDownGt10WarnMail(TencentStockModel stockModel, String mailAddress) {
+        if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
+            senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
         }
     }
 
+    private void senddownWarnMails(String mailAddress, String codeName, BigDecimal price, BigDecimal perPriceVolatility) {
+        MailUtil.send(mailAddress, "股票大幅波动提醒", codeName + " 下跌:" + perPriceVolatility + " 当前价格为：" + price, false);
+    }
+
+    /**
+     * 当前价格和股票策略对比
+     *
+     * @param stockModel
+     * @param stockStrategyJobDTO
+     */
     private void comparseStockStrategy(TencentStockModel stockModel, StockStrategyJobDTO stockStrategyJobDTO) {
         if (ObjectUtils.isNotNull(stockStrategyJobDTO.getPriceAnchor()) && stockStrategyJobDTO.getPriceAnchor().compareTo(stockModel.getPrice()) > 0) {
             sendWarnMails(stockStrategyJobDTO.getMailAddress(), stockModel.getCodeName(), stockModel.getPrice());

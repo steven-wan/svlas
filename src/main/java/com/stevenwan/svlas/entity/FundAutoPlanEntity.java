@@ -42,15 +42,14 @@ public class FundAutoPlanEntity extends BaseEntity {
      */
     private Date createTime;
 
-    /**
-     * 修改人
-     */
-    private Long updateUser;
 
     /**
      * 修改时间
      */
     private Date updateTime;
 
-
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已停止
+     */
+    private Integer status;
 }
