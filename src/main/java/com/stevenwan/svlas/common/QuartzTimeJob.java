@@ -57,6 +57,12 @@ public class QuartzTimeJob extends QuartzJobBean {
                     throw new RuntimeException(e);
                 }
             });
+
+
+            if (DateUtil.date().hour(true) == 14) {
+                sendGoodMails(strategyJobDTOList.get(0).getMailAddress());
+            }
+
         }
 
         System.out.println("打印测试数据");
@@ -90,10 +96,6 @@ public class QuartzTimeJob extends QuartzJobBean {
             StockStrategyEntity strategyEntity = stockStrategyService.getById(stockStrategyJobDTO.getId());
             strategyEntity.setStatus(HsjcConstant.STOCK_STRATEGY_STATUS_ACTIVATED);
             stockStrategyService.updateById(strategyEntity);
-        } else {
-            if (DateUtil.date().hour(true) == 14) {
-                sendGoodMails(stockStrategyJobDTO.getMailAddress());
-            }
         }
     }
 
