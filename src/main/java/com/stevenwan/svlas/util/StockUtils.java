@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -58,19 +59,24 @@ public class StockUtils {
     }
 
 
-    public static TencentStockModel tencentTimeData(String url, String code) {
-        String responseDatas = HttpUtil.get(url.concat(code));
+    public static List<TencentStockModel> tencentTimeData(String url, String codeList) {
+        String responseDatas = HttpUtil.get(url.concat(codeList));
+        List<TencentStockModel> stockModelList = new ArrayList<>();
 
-        String[] strings = responseDatas.split("~");
-        System.out.println(strings[1]);
-        System.out.println(strings[2]);
-        System.out.println(strings[3]);
-        System.out.println(strings[5]);
-        TencentStockModel stockModel = new TencentStockModel();
-        stockModel.setCode(strings[2]);
-        stockModel.setCodeName(strings[1]);
-        stockModel.setPrice(new BigDecimal(strings[3]));
-        stockModel.setPerPriceVolatility(new BigDecimal(strings[5]));
-        return stockModel;
+        String[] split = responseDatas.split(";");
+        for (String obj : split) {
+            String substring = obj.substring(obj.indexOf("=") + 1);
+            String[] strings = substring.split("~");
+
+            if (!strings[0].equals("\n")) {
+                TencentStockModel stockModel = new TencentStockModel();
+                stockModel.setCode(strings[2]);
+                stockModel.setCodeName(strings[1]);
+                stockModel.setPrice(new BigDecimal(strings[3]));
+                stockModel.setPerPriceVolatility(new BigDecimal(strings[5]));
+                stockModelList.add(stockModel);
+            }
+        }
+        return stockModelList;
     }
 }

@@ -1,5 +1,6 @@
 package com.stevenwan.svlas.common;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.mail.MailUtil;
@@ -8,8 +9,10 @@ import com.stevenwan.svlas.dto.stock.*;
 import com.stevenwan.svlas.entity.StockEntity;
 import com.stevenwan.svlas.entity.StockStrategyEntity;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
+import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
 import com.stevenwan.svlas.service.StockService;
 import com.stevenwan.svlas.service.StockStrategyService;
+import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.StockUserInfoService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
@@ -21,6 +24,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author steven-wan
@@ -38,6 +42,9 @@ public class QuartzTimeJob extends QuartzJobBean {
     private StockUserInfoService stockUserInfoService;
 
     @Autowired
+    private StockUserInfoRecordService stockUserInfoRecordService;
+
+    @Autowired
     private StockService stockService;
 
     @Override
@@ -47,25 +54,51 @@ public class QuartzTimeJob extends QuartzJobBean {
         List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(Long.valueOf(userId));
 
         if (CollectionUtil.isNotEmpty(strategyJobDTOList)) {
+            String codeList = strategyJobDTOList.stream().map(stockStrategyJobDTO -> "s_".concat(stockStrategyJobDTO.getCode())).collect(Collectors.joining(","));
+            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData(stockConfig.getTencentTimeUrl(), codeList);
+            //更新股票池的价格
+            updateStockUserInfo(stockModelList);
+
             strategyJobDTOList.forEach(stockStrategyJobDTO -> {
-                TencentStockModel stockModel = StockUtils.tencentTimeData(stockStrategyJobDTO.getCode(), stockConfig.getTencentTimeUrl());
-                comparseStockStrategy(stockModel, stockStrategyJobDTO);
-                ifDownGt10WarnMail(stockModel, stockStrategyJobDTO.getMailAddress());
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                int index = stockModelList.indexOf(stockStrategyJobDTO);
+                if (index >= 0) {
+                    TencentStockModel tencentStockModel = stockModelList.get(index);
+                    comparseStockStrategy(tencentStockModel, stockStrategyJobDTO);
+                    ifDownGt10WarnMail(tencentStockModel, stockStrategyJobDTO.getMailAddress());
                 }
             });
-
 
             if (DateUtil.date().hour(true) == 14) {
                 sendGoodMails(strategyJobDTOList.get(0).getMailAddress());
             }
 
         }
+    }
 
-        System.out.println("打印测试数据");
+    /**
+     * 更新股票池当前价格
+     *
+     * @param stockModelList
+     */
+    private void updateStockUserInfo(List<TencentStockModel> stockModelList) {
+        stockModelList.forEach(tencentStockModel -> {
+            //stockUserInfo
+            StockUserInfoEntity stockUserInfoEntity = stockUserInfoService.findByCode(tencentStockModel.getCode());
+            stockUserInfoEntity.setCurrentPrice(tencentStockModel.getPrice());
+            stockUserInfoEntity.setCreateTime(DateUtil.date());
+
+            stockUserInfoEntity.setUpdateTime(DateUtil.date());
+            stockUserInfoService.updateById(stockUserInfoEntity);
+
+            //stockUserInfoRecord
+            StockUserInfoRecordEntity stockUserInfoRecordEntity = stockUserInfoRecordService.findByCodeAndDate(tencentStockModel.getCode(), DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
+            if (!ObjectUtils.isNotNull(stockUserInfoRecordEntity)) {
+                stockUserInfoRecordEntity = new StockUserInfoRecordEntity();
+                BeanUtil.copyProperties(stockUserInfoEntity, stockUserInfoRecordEntity);
+            }
+            stockUserInfoRecordEntity.setCurrentPrice(tencentStockModel.getPrice());
+            stockUserInfoRecordService.saveOrUpdate(stockUserInfoRecordEntity);
+        });
     }
 
     /**
@@ -108,7 +141,7 @@ public class QuartzTimeJob extends QuartzJobBean {
         MailUtil.send(mailAddress, "股票加仓和买点提醒", content, false);
     }
 
-    private void stockUserInfo() {
+    private void getStockUserInfo() {
         List<StockUserInfoEntity> list = stockUserInfoService.list();
         StockStatisticalModel model = new StockStatisticalModel();
 

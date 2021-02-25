@@ -1,9 +1,9 @@
 package com.stevenwan.svlas.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.stevenwan.svlas.mapper.StockUserInfoMapper;
 import com.stevenwan.svlas.service.StockUserInfoService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,4 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, StockUserInfoEntity> implements StockUserInfoService {
 
+    @Override
+    public StockUserInfoEntity findByCode(String code) {
+        return baseMapper.findByCode(code);
+    }
 }

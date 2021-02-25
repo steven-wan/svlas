@@ -38,6 +38,11 @@ public class StockUserInfoRecordEntity extends BaseEntity {
     private BigDecimal costPrice;
 
     /**
+     * 当前价
+     */
+    private BigDecimal currentPrice;
+
+    /**
      * 股数
      */
     private Integer nums;

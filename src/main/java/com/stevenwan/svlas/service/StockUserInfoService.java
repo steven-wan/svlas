@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface StockUserInfoService extends IService<StockUserInfoEntity> {
 
+    /**
+     * 根据 code
+     * @param code
+     * @return
+     */
+    StockUserInfoEntity findByCode(String code);
 }

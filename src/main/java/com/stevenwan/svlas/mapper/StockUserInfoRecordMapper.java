@@ -1,7 +1,9 @@
 package com.stevenwan.svlas.mapper;
 
-import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface StockUserInfoRecordMapper extends BaseMapper<StockUserInfoRecordEntity> {
 
+    @Select("select * from stock_user_info_record where code=#{code} and DATE_FORMAT(create_time,'%Y-%m-%d') =#{date}")
+    StockUserInfoRecordEntity findByCodeAndDate(@Param("code") String code, @Param("date") String date);
 }

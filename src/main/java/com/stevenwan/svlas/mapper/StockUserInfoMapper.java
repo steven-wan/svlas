@@ -1,7 +1,9 @@
 package com.stevenwan.svlas.mapper;
 
-import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.entity.StockUserInfoEntity;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface StockUserInfoMapper extends BaseMapper<StockUserInfoEntity> {
 
+    @Select("select * from stock_user_info where code=#{code} ")
+    StockUserInfoEntity findByCode(@Param("code") String code);
 }

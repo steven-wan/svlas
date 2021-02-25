@@ -1,5 +1,6 @@
 package com.stevenwan.svlas.service.impl;
 
+import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
 import com.stevenwan.svlas.mapper.StockUserInfoRecordMapper;
 import com.stevenwan.svlas.service.StockUserInfoRecordService;
@@ -16,5 +17,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class StockUserInfoRecordServiceImpl extends ServiceImpl<StockUserInfoRecordMapper, StockUserInfoRecordEntity> implements StockUserInfoRecordService {
-
+    @Override
+    public StockUserInfoRecordEntity findByCodeAndDate(String code, String date) {
+        return baseMapper.findByCodeAndDate(code,date);
+    }
 }
