@@ -4,9 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.common.HsjcConstant;
+import com.stevenwan.svlas.common.QuartzMonthJob;
 import com.stevenwan.svlas.common.QuartzTimeJob;
 import com.stevenwan.svlas.dto.stock.QuartzAddJobDTO;
+import com.stevenwan.svlas.dto.stock.QuartzAddMonthJobDTO;
 import com.stevenwan.svlas.dto.stock.QuartzUpdateJobDTO;
+import com.stevenwan.svlas.dto.stock.QuartzUpdateMonthJobDTO;
 import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 import com.stevenwan.svlas.mapper.QuartzSchedulerJobsMapper;
 import com.stevenwan.svlas.service.QuartzSchedulerJobsService;
@@ -128,6 +131,64 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
             }
         }
 
+
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean addMonthJob(QuartzAddMonthJobDTO quartzAddMonthJobDTO) {
+        QuartzSchedulerJobsEntity jobsMonthEntity = new QuartzSchedulerJobsEntity();
+        BeanUtil.copyProperties(quartzAddMonthJobDTO, jobsMonthEntity, new String[]{"id"});
+        jobsMonthEntity.setCreateTime(DateUtil.date());
+        jobsMonthEntity.setCreateUser(quartzAddMonthJobDTO.getUserId());
+        jobsMonthEntity.setStatus(HsjcConstant.JOB_STATUS_EXCUTING);
+        save(jobsMonthEntity);
+
+        Scheduler scheduler = getScheduler();
+        QuartzJobsUtils.startJobWithCronTrigger(scheduler, QuartzMonthJob.class, quartzAddMonthJobDTO.getJobName(),
+                quartzAddMonthJobDTO.getJobGroupName(), quartzAddMonthJobDTO.getCornExpression(), quartzAddMonthJobDTO.getUserId());
+
+        try {
+            scheduler.start();
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean updateMonthJob(QuartzUpdateMonthJobDTO quartzUpdateMonthJobDTO) {
+        QuartzSchedulerJobsEntity jobsEntity = getQuartzSchedulerJobsEntityById(quartzUpdateMonthJobDTO.getJobId());
+        Scheduler scheduler = getScheduler();
+        if (!jobsEntity.getCornExpression().equalsIgnoreCase(quartzUpdateMonthJobDTO.getCornExpression())) {
+            jobsEntity.setUpdateTime(DateUtil.date());
+            jobsEntity.setCornExpression(quartzUpdateMonthJobDTO.getCornExpression());
+            updateById(jobsEntity);
+            QuartzJobsUtils.updateJobWithCronTrigger(scheduler, jobsEntity.getJobName(),
+                    jobsEntity.getJobGroupName(), quartzUpdateMonthJobDTO.getCornExpression());
+        }
+
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean deleteMonthJob(Long jobId) {
+        QuartzSchedulerJobsEntity jobsEntity = getQuartzSchedulerJobsEntityById(jobId);
+        Scheduler scheduler = getScheduler();
+        JobKey jobKey = new JobKey(jobsEntity.getJobName(), jobsEntity.getJobGroupName());
+        try {
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+            if (ObjectUtils.isNotNull(jobDetail)) {
+                jobsEntity.setUpdateTime(DateUtil.date());
+                jobsEntity.setStatus(HsjcConstant.JOB_STATUS_DELETE);
+                updateById(jobsEntity);
+                scheduler.deleteJob(jobKey);
+            }
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
 
         return Boolean.TRUE;
     }

@@ -2,7 +2,9 @@ package com.stevenwan.svlas.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.stevenwan.svlas.dto.stock.QuartzAddJobDTO;
+import com.stevenwan.svlas.dto.stock.QuartzAddMonthJobDTO;
 import com.stevenwan.svlas.dto.stock.QuartzUpdateJobDTO;
+import com.stevenwan.svlas.dto.stock.QuartzUpdateMonthJobDTO;
 import com.stevenwan.svlas.entity.QuartzSchedulerJobsEntity;
 
 /**
@@ -39,4 +41,28 @@ public interface QuartzSchedulerJobsService extends IService<QuartzSchedulerJobs
      * @return
      */
     Boolean updateTimesJob(QuartzUpdateJobDTO quartzUpdateJobDTO);
+
+    /**
+     * 新增月任务
+     *
+     * @param quartzAddMonthJobDTO
+     * @return
+     */
+    Boolean addMonthJob(QuartzAddMonthJobDTO quartzAddMonthJobDTO);
+
+    /**
+     * 更新月任务
+     *
+     * @param quartzUpdateMonthJobDTO
+     * @return
+     */
+    Boolean updateMonthJob(QuartzUpdateMonthJobDTO quartzUpdateMonthJobDTO);
+
+    /**
+     * 删除月任务
+     *
+     * @param jobId
+     * @return
+     */
+    Boolean deleteMonthJob(Long jobId);
 }

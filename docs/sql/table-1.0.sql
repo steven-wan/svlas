@@ -93,6 +93,18 @@ CREATE TABLE `stock_user_info_record`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户股票市值变更表';
 
+DROP TABLE IF EXISTS `stock_user_strategy_record`;
+CREATE TABLE `stock_user_strategy_record`
+(
+    `id`            bigint(64) NOT NULL COMMENT 'ID',
+    `user_id`       bigint(64) NOT NULL COMMENT '用户ID',
+    `strategy_type` int(10)        DEFAULT NULL COMMENT '策略类型 买点，卖出，加仓',
+    `nums`          int(10)        DEFAULT NULL COMMENT '股数',
+    `strategy_id`   bigint(64)     DEFAULT NULL COMMENT '策略ID',
+    `create_time`   datetime       DEFAULT NULL COMMENT '创建日期',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='用户股票策略变更表';
 
 DROP TABLE IF EXISTS `stock_user_strategy`;
 CREATE TABLE `stock_user_strategy`
@@ -108,19 +120,6 @@ CREATE TABLE `stock_user_strategy`
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户股票策略表';
-
-DROP TABLE IF EXISTS `stock_user_strategy_record`;
-CREATE TABLE `stock_user_strategy_record`
-(
-    `id`            bigint(64) NOT NULL COMMENT 'ID',
-    `user_id`       bigint(64) NOT NULL COMMENT '用户ID',
-    `strategy_type` int(10)        DEFAULT NULL COMMENT '策略类型 买点，卖出，加仓',
-    `nums`          int(10)        DEFAULT NULL COMMENT '股数',
-    `strategy_id`   bigint(64)     DEFAULT NULL COMMENT '策略ID',
-    `create_time`   datetime       DEFAULT NULL COMMENT '创建日期',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户股票策略变更表';
 
 DROP TABLE IF EXISTS `stock_strategy`;
 CREATE TABLE `stock_strategy`

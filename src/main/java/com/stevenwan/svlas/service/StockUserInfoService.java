@@ -19,4 +19,10 @@ public interface StockUserInfoService extends IService<StockUserInfoEntity> {
      * @return
      */
     StockUserInfoEntity findByCode(String code);
+
+    /**
+     * 股票比例
+     * @return
+     */
+    String getStockUserInfo();
 }

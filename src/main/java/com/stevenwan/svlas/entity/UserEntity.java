@@ -51,5 +51,8 @@ public class UserEntity extends BaseEntity {
      */
     private Date updateTime;
 
-
+    /**
+     * 邮件地址
+     */
+    private String mailAddress;
 }

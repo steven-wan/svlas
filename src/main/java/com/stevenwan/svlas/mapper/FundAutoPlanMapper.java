@@ -1,7 +1,10 @@
 package com.stevenwan.svlas.mapper;
 
-import com.stevenwan.svlas.entity.FundAutoPlanEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.dto.stock.FundAutoPlanModel;
+import com.stevenwan.svlas.entity.FundAutoPlanEntity;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-01-28
  */
 public interface FundAutoPlanMapper extends BaseMapper<FundAutoPlanEntity> {
-
+    List<FundAutoPlanModel> findByUserId(Long userId);
 }

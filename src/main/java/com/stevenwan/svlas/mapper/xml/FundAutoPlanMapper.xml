@@ -8,4 +8,18 @@
         user_id, code, price, create_time, update_user, update_time
     </sql>
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="fundAutoPlanJobResultMap" type="com.stevenwan.svlas.dto.stock.FundAutoPlanModel">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="codeName" property="code_name"/>
+        <result column="price" property="price"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="fundAutoPlanJobResultMap">
+        SELECT fund.id,s.name as code_name, fund.price,fund.code
+        FROM fund_auto_plan fund
+                 JOIN stock s ON s.code = fund.code
+        where fund.user_id = #{userId}
+    </select>
 </mapper>

@@ -1,12 +1,9 @@
 package com.stevenwan.svlas.controller;
 
 
-import cn.hutool.core.date.DateUtil;
-import com.stevenwan.svlas.dto.stock.StockStrategyDTO;
-import com.stevenwan.svlas.entity.StockStrategyEntity;
-import com.stevenwan.svlas.service.StockStrategyService;
+import com.stevenwan.svlas.dto.stock.StockUserStrategyDTO;
+import com.stevenwan.svlas.service.StockUserStrategyService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,15 +19,20 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class StockStrategyController {
 
-    private StockStrategyService strategyService;
 
+    private StockUserStrategyService stockUserStrategyService;
+
+    /**
+     * 新增用户股票策略
+     *
+     * @param stockUserStrategyDTO
+     * @return
+     */
     @PostMapping("/addStockStrategy")
     @ResponseBody
-    public Boolean addStockStrategy(@RequestBody StockStrategyDTO stockStrategyDTO) {
-        StockStrategyEntity entity = new StockStrategyEntity();
-        BeanUtils.copyProperties(stockStrategyDTO, entity);
-        entity.setCreateTime(DateUtil.date());
-        return strategyService.save(entity);
+    public Boolean addStockStrategy(@RequestBody StockUserStrategyDTO stockUserStrategyDTO) {
+        return stockUserStrategyService.saveUserStrategy(stockUserStrategyDTO);
     }
+
 }
 

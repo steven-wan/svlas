@@ -118,4 +118,14 @@ public class HsjcConstant {
      * 类型 FUND 基金，STOCK 股票，期货，黄金
      */
     public static final String STOCK_TYPE_FUND = "FUND";
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已停止
+     */
+    public static Integer FUND_AUTO_PLAN_STATUS_EXCUTEING = 0;
+
+    /**
+     * 状态： 0 - 代表正在执行  1 - 已停止
+     */
+    public static Integer FUND_AUTO_PLAN_STATUS_STOP = 1;
 }

@@ -1,7 +1,10 @@
 package com.stevenwan.svlas.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
+
+import java.util.List;
 
 /**
  * <p>
@@ -20,4 +23,11 @@ public interface StockUserInfoRecordService extends IService<StockUserInfoRecord
      * @return
      */
     StockUserInfoRecordEntity findByCodeAndDate(String code, String date);
+
+    /**
+     * 更新股票比例
+     *
+     * @param stockModelList
+     */
+    void updateStockUserInfo(List<TencentStockModel> stockModelList);
 }

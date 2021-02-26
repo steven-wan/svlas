@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author steven-wan
@@ -11,11 +12,11 @@ import java.util.Date;
  * @date 2021-02-01 17:53
  */
 @Data
-public class StockStrategyDTO {
+public class FundAutoPlanMonthJobDTO {
     /**
-     * 用户ID
+     * id
      */
-    private Long userId;
+    private Long id;
 
     /**
      * 股票代码
@@ -41,4 +42,26 @@ public class StockStrategyDTO {
      * 策略类型 买点，卖出，加仓
      */
     private Integer strategyType;
+
+    /**
+     * 股数
+     */
+    private Integer nums;
+
+    /**
+     * 邮件地址
+     */
+    private String mailAddress;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        TencentStockModel that = (TencentStockModel) o;
+        return Objects.equals(code, that.getCode());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
+    }
 }
