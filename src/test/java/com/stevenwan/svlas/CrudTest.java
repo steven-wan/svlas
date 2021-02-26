@@ -1,20 +1,23 @@
-package com.stevenwan.svlas.common;
+package com.stevenwan.svlas;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.mail.MailUtil;
-import com.stevenwan.svlas.config.StockConfig;
+import com.stevenwan.svlas.common.HsjcConstant;
+import com.stevenwan.svlas.dto.stock.FundAutoPlanModel;
 import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.StockStrategyEntity;
+import com.stevenwan.svlas.service.FundAutoPlanService;
 import com.stevenwan.svlas.service.StockStrategyService;
 import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,27 +26,37 @@ import java.util.stream.Collectors;
 /**
  * @author steven-wan
  * @desc
- * @date 2021-02-23 16:40
+ * @date 2021-02-26 14:33
  */
-public class QuartzTimeJob extends QuartzJobBean {
-    @Autowired
-    private StockStrategyService stockStrategyService;
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CrudTest {
 
     @Autowired
-    private StockConfig stockConfig;
+    StockUserInfoRecordService stockUserInfoRecordService;
 
     @Autowired
-    private StockUserInfoRecordService stockUserInfoRecordService;
+    FundAutoPlanService fundAutoPlanService;
+    @Autowired
+    StockStrategyService stockStrategyService;
 
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        String userId = (String) jobExecutionContext.getJobDetail().getJobDataMap().get("userId");
+    @Test
+    void fundAutoPlanTest() {
+        List<FundAutoPlanModel> fundAutoPlanEntityList = fundAutoPlanService.findByUserId(Long.valueOf("1"));
 
-        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(Long.valueOf(userId));
+        if (CollectionUtil.isNotEmpty(fundAutoPlanEntityList)) {
+            sendFundAutoPlanMails(fundAutoPlanEntityList);
+        }
+
+    }
+
+    @Test
+    void timeQuartzTest() {
+        List<StockStrategyJobDTO> strategyJobDTOList = stockStrategyService.findByUserId(Long.valueOf("1"));
 
         if (CollectionUtil.isNotEmpty(strategyJobDTOList)) {
             String codeList = strategyJobDTOList.stream().map(stockStrategyJobDTO -> "s_".concat(stockStrategyJobDTO.getCode())).collect(Collectors.joining(","));
-            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData(stockConfig.getTencentTimeUrl(), codeList);
+            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData("https://qt.gtimg.cn/?q=s_", codeList);
 
             strategyJobDTOList.forEach(stockStrategyJobDTO -> {
                 int index = stockModelList.indexOf(stockStrategyJobDTO);
@@ -57,10 +70,13 @@ public class QuartzTimeJob extends QuartzJobBean {
             if (DateUtil.date().hour(true) == 14) {
                 sendGoodMails(strategyJobDTOList.get(0).getMailAddress());
             }
-
         }
     }
 
+    private void sendFundAutoPlanMails(List<FundAutoPlanModel> fundAutoPlanEntityList) {
+        String collect = fundAutoPlanEntityList.stream().map(fundAutoPlanModel -> "当前股票：" + fundAutoPlanModel.getCodeName() + ",定投价格：" + fundAutoPlanModel.getPrice()).collect(Collectors.joining("\n"));
+        MailUtil.send("951520698@qq.com", "股票定投提醒", collect, false);
+    }
 
     /**
      * 如果波动大于 10 就发邮件提醒
@@ -73,9 +89,11 @@ public class QuartzTimeJob extends QuartzJobBean {
         }
     }
 
-    private void senddownWarnMails(String mailAddress, String codeName, BigDecimal price, BigDecimal perPriceVolatility) {
+    private void senddownWarnMails(String mailAddress, String codeName, BigDecimal price, BigDecimal
+            perPriceVolatility) {
         MailUtil.send(mailAddress, "股票大幅波动提醒", codeName + " 下跌:" + perPriceVolatility + " 当前价格为：" + price, false);
     }
+
 
     /**
      * 当前价格和股票策略对比

@@ -27,9 +27,4 @@ public class FundAutoPlanAddDTO {
      */
     private BigDecimal price;
 
-    /**
-     * 定投日期
-     */
-    private Date createTime;
-
 }

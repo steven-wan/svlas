@@ -45,9 +45,10 @@ public class StockUserStrategyServiceImpl extends ServiceImpl<StockUserStrategyM
         userStrategyEntity.setStrategyId(entity.getId());
         userStrategyEntity.setStrategyType(userStrategyDTO.getStrategyType());
         userStrategyEntity.setNums(userStrategyDTO.getNums());
+        save(userStrategyEntity);
         //save record
         StockUserStrategyRecordEntity recordEntity = new StockUserStrategyRecordEntity();
-        BeanUtils.copyProperties(entity, recordEntity, new String[]{"id"});
+        BeanUtils.copyProperties(userStrategyEntity, recordEntity, new String[]{"id"});
 
         return strategyRecordService.save(recordEntity);
     }

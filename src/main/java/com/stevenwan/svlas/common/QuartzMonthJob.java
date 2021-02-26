@@ -2,14 +2,10 @@ package com.stevenwan.svlas.common;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.extra.mail.MailUtil;
-import com.stevenwan.svlas.config.StockConfig;
 import com.stevenwan.svlas.dto.stock.FundAutoPlanModel;
-import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.UserEntity;
 import com.stevenwan.svlas.service.FundAutoPlanService;
-import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.UserService;
-import com.stevenwan.svlas.util.StockUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +20,6 @@ import java.util.stream.Collectors;
  * @date 2021-02-23 16:40
  */
 public class QuartzMonthJob extends QuartzJobBean {
-    @Autowired
-    private StockConfig stockConfig;
-
-    @Autowired
-    private StockUserInfoRecordService stockUserInfoRecordService;
 
     @Autowired
     private FundAutoPlanService fundAutoPlanService;
@@ -44,11 +35,6 @@ public class QuartzMonthJob extends QuartzJobBean {
         List<FundAutoPlanModel> fundAutoPlanEntityList = fundAutoPlanService.findByUserId(Long.valueOf(userId));
 
         if (CollectionUtil.isNotEmpty(fundAutoPlanEntityList)) {
-            String codeList = fundAutoPlanEntityList.stream().map(fundAutoPlanEntity -> "s_".concat(fundAutoPlanEntity.getCode())).collect(Collectors.joining(","));
-            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData(stockConfig.getTencentTimeUrl(), codeList);
-            //更新股票池的价格
-            stockUserInfoRecordService.updateStockUserInfo(stockModelList);
-
             sendFundAutoPlanMails(fundAutoPlanEntityList, userId);
         }
     }

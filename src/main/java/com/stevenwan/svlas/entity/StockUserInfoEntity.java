@@ -62,10 +62,6 @@ public class StockUserInfoEntity extends BaseEntity {
      */
     private Date createTime;
 
-    /**
-     * 修改人
-     */
-    private Long updateUser;
 
     /**
      * 修改时间

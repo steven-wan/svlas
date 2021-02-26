@@ -1,7 +1,7 @@
 package com.stevenwan.svlas.service;
 
-import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.stevenwan.svlas.entity.StockUserInfoEntity;
 
 /**
  * <p>
@@ -15,14 +15,18 @@ public interface StockUserInfoService extends IService<StockUserInfoEntity> {
 
     /**
      * 根据 code
+     *
      * @param code
      * @return
      */
     StockUserInfoEntity findByCode(String code);
 
+
     /**
      * 股票比例
+     *
+     * @param userId
      * @return
      */
-    String getStockUserInfo();
+    String getStockUserInfo(Long userId);
 }

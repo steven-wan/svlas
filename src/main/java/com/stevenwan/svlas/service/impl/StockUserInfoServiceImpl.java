@@ -4,21 +4,22 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stevenwan.svlas.common.HsjcConstant;
-import com.stevenwan.svlas.dto.stock.StockRateModel;
-import com.stevenwan.svlas.dto.stock.StockRegionRateModel;
-import com.stevenwan.svlas.dto.stock.StockStatisticalModel;
-import com.stevenwan.svlas.dto.stock.StockTypeRateModel;
+import com.stevenwan.svlas.config.StockConfig;
+import com.stevenwan.svlas.dto.stock.*;
 import com.stevenwan.svlas.entity.StockEntity;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.stevenwan.svlas.mapper.StockUserInfoMapper;
 import com.stevenwan.svlas.service.StockService;
+import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.StockUserInfoService;
+import com.stevenwan.svlas.util.StockUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -33,13 +34,27 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
     @Autowired
     private StockService stockService;
 
+    @Autowired
+    private StockUserInfoRecordService stockUserInfoRecordService;
+
+    @Autowired
+    private StockConfig stockConfig;
+
     @Override
     public StockUserInfoEntity findByCode(String code) {
         return baseMapper.findByCode(code);
     }
 
     @Override
-    public String getStockUserInfo() {
+    public String getStockUserInfo(Long userId) {
+
+        List<StockUserInfoEntity> stockUserInfoEntityList = baseMapper.findByUserId(userId);
+
+        String codeList = stockUserInfoEntityList.stream().map(stockUserInfoEntity -> "s_".concat(stockUserInfoEntity.getCode())).collect(Collectors.joining(","));
+        List<TencentStockModel> stockModelList = StockUtils.tencentTimeData(stockConfig.getTencentTimeUrl(), codeList);
+        //更新股票池的价格
+        stockUserInfoRecordService.updateStockUserInfo(stockModelList);
+
         List<StockUserInfoEntity> list = list();
         StockStatisticalModel model = new StockStatisticalModel();
 
