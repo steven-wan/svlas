@@ -10,7 +10,7 @@ import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.StockStrategyEntity;
 import com.stevenwan.svlas.service.FundAutoPlanService;
 import com.stevenwan.svlas.service.StockStrategyService;
-import com.stevenwan.svlas.service.StockUserInfoRecordService;
+import com.stevenwan.svlas.service.StockUserInfoService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
 import org.junit.jupiter.api.Test;
@@ -31,14 +31,12 @@ import java.util.stream.Collectors;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CrudTest {
-
-    @Autowired
-    StockUserInfoRecordService stockUserInfoRecordService;
-
     @Autowired
     FundAutoPlanService fundAutoPlanService;
     @Autowired
     StockStrategyService stockStrategyService;
+    @Autowired
+    private StockUserInfoService stockUserInfoService;
 
     @Test
     void fundAutoPlanTest() {
@@ -48,6 +46,11 @@ public class CrudTest {
             sendFundAutoPlanMails(fundAutoPlanEntityList);
         }
 
+    }
+
+    @Test
+    void stockUserInfoTest(){
+        stockUserInfoService.getStockUserInfo(1L);
     }
 
     @Test
@@ -63,7 +66,7 @@ public class CrudTest {
                 if (index >= 0) {
                     TencentStockModel tencentStockModel = stockModelList.get(index);
                     comparseStockStrategy(tencentStockModel, stockStrategyJobDTO);
-                    ifDownGt10WarnMail(tencentStockModel, stockStrategyJobDTO.getMailAddress());
+                    ifStockPriceDownWarnMail(tencentStockModel, stockStrategyJobDTO.getMailAddress(), stockStrategyJobDTO.getType());
                 }
             });
 
@@ -74,8 +77,13 @@ public class CrudTest {
     }
 
     private void sendFundAutoPlanMails(List<FundAutoPlanModel> fundAutoPlanEntityList) {
-        String collect = fundAutoPlanEntityList.stream().map(fundAutoPlanModel -> "当前股票：" + fundAutoPlanModel.getCodeName() + ",定投价格：" + fundAutoPlanModel.getPrice()).collect(Collectors.joining("\n"));
-        MailUtil.send("951520698@qq.com", "股票定投提醒", collect, false);
+        String content = "<html><body><table><tr><td ><b>股票名称</b></td> <td><b>定投额度</b></td></tr>";
+        for (FundAutoPlanModel obj : fundAutoPlanEntityList) {
+            content = content + "<tr><td>" + obj.getCodeName() + "</td> <td>" + obj.getPrice() + "</td></tr>";
+        }
+        String tail = "</table><a href=\"https://www.baidu.com\">股票占比比例</a></body></html>";
+
+        MailUtil.send("951520698@qq.com", "股票定投提醒", content + tail, true);
     }
 
     /**
@@ -83,9 +91,20 @@ public class CrudTest {
      *
      * @param stockModel
      */
-    private void ifDownGt10WarnMail(TencentStockModel stockModel, String mailAddress) {
-        if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
-            senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+    private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type) {
+        switch (type) {
+            case HsjcConstant.STOCK_TYPE_FUND:
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
+                    senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+                }
+                break;
+            case HsjcConstant.STOCK_TYPE_STOCK:
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-5)) <= 0) {
+                    senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -119,4 +138,5 @@ public class CrudTest {
         String content = "股票【加仓】和【买点】提醒：" + codeName + "当前价格为：" + price + "\\r\\n";
         MailUtil.send(mailAddress, "股票加仓和买点提醒", content, false);
     }
+
 }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author steven-wan
@@ -41,7 +40,14 @@ public class QuartzMonthJob extends QuartzJobBean {
 
     private void sendFundAutoPlanMails(List<FundAutoPlanModel> fundAutoPlanEntityList, String userId) {
         UserEntity userEntity = userService.getById(Long.valueOf(userId));
-        String collect = fundAutoPlanEntityList.stream().map(fundAutoPlanModel -> "当前股票：" + fundAutoPlanModel.getCodeName() + ",定投价格：" + fundAutoPlanModel.getPrice()).collect(Collectors.joining("\n"));
-        MailUtil.send(userEntity.getMailAddress(), "股票定投提醒", collect, false);
+
+        String content = "<html><body><table><tr><td ><b>股票名称</b></td> <td><b>定投额度</b></td></tr>";
+        for (FundAutoPlanModel obj : fundAutoPlanEntityList) {
+            content = content + "<tr><td>" + obj.getCodeName() + "</td> <td>" + obj.getPrice() + "</td></tr>";
+        }
+        String tail = "</table><a href=\"https://www.baidu.com\">股票占比比例</a></body></html>";
+
+        MailUtil.send(userEntity.getMailAddress(), "股票定投提醒", content + tail, true);
     }
+
 }

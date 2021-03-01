@@ -1,7 +1,7 @@
 package com.stevenwan.svlas.service;
 
-import com.stevenwan.svlas.entity.StockEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.stevenwan.svlas.entity.StockEntity;
 
 /**
  * <p>
@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-01-28
  */
 public interface StockService extends IService<StockEntity> {
-
+    StockEntity findByCode(String code);
 }

@@ -28,5 +28,5 @@ public interface StockUserInfoService extends IService<StockUserInfoEntity> {
      * @param userId
      * @return
      */
-    String getStockUserInfo(Long userId);
+    void getStockUserInfo(Long userId);
 }

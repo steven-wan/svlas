@@ -34,7 +34,7 @@ spring:
 ##������վ
 stock:
   netease-history-url: http://quotes.money.163.com/service/chddata.html?code=CODE&start=START&end=END&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP
-  tencent-time-url: https://qt.gtimg.cn/?q=s_
+  tencent-time-url: https://qt.gtimg.cn/?q=
 
 
 

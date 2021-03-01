@@ -12,11 +12,13 @@ import com.stevenwan.svlas.mapper.StockUserInfoMapper;
 import com.stevenwan.svlas.service.StockService;
 import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.StockUserInfoService;
+import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,11 +44,11 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
 
     @Override
     public StockUserInfoEntity findByCode(String code) {
-        return baseMapper.findByCode(code);
+        return baseMapper.selectStockUserInfo(code);
     }
 
     @Override
-    public String getStockUserInfo(Long userId) {
+    public void getStockUserInfo(Long userId) {
 
         List<StockUserInfoEntity> stockUserInfoEntityList = baseMapper.findByUserId(userId);
 
@@ -59,81 +61,118 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
         StockStatisticalModel model = new StockStatisticalModel();
 
         if (CollectionUtil.isNotEmpty(list)) {
-            double totalAmt = list.stream().mapToDouble(stockUserInfoEntity -> stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())).doubleValue()).sum();
+            double totalAmt = list.stream().mapToDouble(stockUserInfoEntity -> stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())).doubleValue()).sum();
             model.setTotalAmt(totalAmt);
 
-            BigDecimal regionATotalAmt = BigDecimal.ZERO;
-            BigDecimal regionHKTotalAmt = BigDecimal.ZERO;
-            BigDecimal regionUSATotalAmt = BigDecimal.ZERO;
-            BigDecimal stockTypeStockTotalAmt = BigDecimal.ZERO;
-            BigDecimal stockTypeFundTotalAmt = BigDecimal.ZERO;
+            MathContext mathContext = new MathContext(2);
+
 
             //股票类型比例
-            List<StockRateModel> stockRateModelList = new ArrayList<>();
-            fillStockModel(stockRateModelList, list, regionATotalAmt, regionHKTotalAmt, regionUSATotalAmt,
-                    stockTypeStockTotalAmt, stockTypeFundTotalAmt, totalAmt);
-            model.setStockRateModelList(stockRateModelList);
+            fillStockModel(model, list, totalAmt, mathContext);
             //证券类型比例
-            fillStockTypeRateModelList(model, stockTypeStockTotalAmt, stockTypeFundTotalAmt);
+            fillStockTypeRateModelList(model, mathContext);
             //地区类型比例
-            List<StockRegionRateModel> stockRegionRateModelList = new ArrayList<>();
+            fillStockRegionModel(model, mathContext);
         }
 
-        return JSONUtil.toJsonStr(model);
+        System.out.println(JSONUtil.toJsonStr(model));
     }
 
-    private void fillStockTypeRateModelList(StockStatisticalModel model, BigDecimal stockTypeStockTotalAmt, BigDecimal stockTypeFundTotalAmt) {
+    private void fillStockRegionModel(StockStatisticalModel model, MathContext mathContext) {
+        BigDecimal regionHKTotalAmt = model.getRegionHKTotalAmt();
+        BigDecimal regionATotalAmt = model.getRegionATotalAmt();
+        BigDecimal regionUSATotalAmt = model.getRegionUSATotalAmt();
+        BigDecimal regionTotalAmt = regionATotalAmt.add(regionHKTotalAmt).add(regionUSATotalAmt);
+        List<StockRegionRateModel> stockRegionRateModelList = new ArrayList<>();
+
+        //A股
+        StockRegionRateModel stockRegionA = new StockRegionRateModel();
+        stockRegionA.setStockTypeName("A股");
+        stockRegionA.setRate(regionATotalAmt.divide(regionTotalAmt, mathContext));
+        stockRegionRateModelList.add(stockRegionA);
+        //港股
+        StockRegionRateModel stockRegionHK = new StockRegionRateModel();
+        stockRegionHK.setStockTypeName("港股");
+        stockRegionHK.setRate(regionHKTotalAmt.divide(regionTotalAmt, mathContext));
+        stockRegionRateModelList.add(stockRegionHK);
+        //USA股
+        StockRegionRateModel stockRegionUSA = new StockRegionRateModel();
+        stockRegionUSA.setStockTypeName("美股");
+        stockRegionUSA.setRate(regionUSATotalAmt.divide(regionTotalAmt, mathContext));
+        stockRegionRateModelList.add(stockRegionUSA);
+        model.setStockRegionRateModelList(stockRegionRateModelList);
+    }
+
+    private void fillStockTypeRateModelList(StockStatisticalModel model, MathContext mathContext) {
         List<StockTypeRateModel> stockTypeRateModelList = new ArrayList<>();
+        BigDecimal stockTypeFundTotalAmt = model.getStockTypeFundTotalAmt();
+        BigDecimal stockTypeStockTotalAmt = model.getStockTypeStockTotalAmt();
+
         //股票
         StockTypeRateModel stockModel = new StockTypeRateModel();
         stockModel.setStockTypeName("股票");
-        stockModel.setRate(stockTypeStockTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt)));
+        stockModel.setRate(stockTypeStockTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt), mathContext));
         stockTypeRateModelList.add(stockModel);
         //基金
         StockTypeRateModel fundModel = new StockTypeRateModel();
         fundModel.setStockTypeName("基金");
-        stockModel.setRate(stockTypeFundTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt)));
+        stockModel.setRate(stockTypeFundTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt), mathContext));
         stockTypeRateModelList.add(fundModel);
 
         model.setStockTypeRateModelList(stockTypeRateModelList);
     }
 
-    private void fillStockModel(List<StockRateModel> stockRateModelList, List<StockUserInfoEntity> list,
-                                BigDecimal regionATotalAmt, BigDecimal regionHKTotalAmt, BigDecimal regionUSATotalAmt,
-                                BigDecimal stockTypeStockTotalAmt, BigDecimal stockTypeFundTotalAmt, double totalAmt) {
+    private void fillStockModel(StockStatisticalModel model, List<StockUserInfoEntity> list, double totalAmt, MathContext mathContext) {
+        List<StockRateModel> stockRateModelList = new ArrayList<>();
+        BigDecimal regionATotalAmt = BigDecimal.ZERO;
+        BigDecimal regionHKTotalAmt = BigDecimal.ZERO;
+        BigDecimal regionUSATotalAmt = BigDecimal.ZERO;
+        BigDecimal stockTypeStockTotalAmt = BigDecimal.ZERO;
+        BigDecimal stockTypeFundTotalAmt = BigDecimal.ZERO;
+
         for (StockUserInfoEntity stockUserInfoEntity : list) {
             //股票占比比例
             StockRateModel rateModel = new StockRateModel();
-            StockEntity stockEntity = stockService.getById(stockUserInfoEntity.getCode());
-            rateModel.setCodeName(stockEntity.getName());
-            rateModel.setRate(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())).divide(BigDecimal.valueOf(totalAmt)));
-            stockRateModelList.add(rateModel);
-            //地区占比比例
-            switch (stockEntity.getRegion()) {
-                case HsjcConstant.STOCK_REGION_A:
-                    regionATotalAmt = regionATotalAmt.add(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
-                    break;
-                case HsjcConstant.STOCK_REGION_HK:
-                    regionHKTotalAmt = regionHKTotalAmt.add(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
-                    break;
-                case HsjcConstant.STOCK_REGION_USA:
-                    regionUSATotalAmt = regionUSATotalAmt.add(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
-                    break;
-                default:
-                    throw new RuntimeException("错误的地区");
+            StockEntity stockEntity = stockService.findByCode(stockUserInfoEntity.getCode());
+
+            if (ObjectUtils.isNotNull(stockEntity)) {
+                rateModel.setCodeName(stockEntity.getName());
+                rateModel.setRate(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())).divide(BigDecimal.valueOf(totalAmt), mathContext));
+                stockRateModelList.add(rateModel);
+                //地区占比比例
+                switch (stockEntity.getRegion()) {
+                    case HsjcConstant.STOCK_REGION_A:
+                        regionATotalAmt = regionATotalAmt.add(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
+                        break;
+                    case HsjcConstant.STOCK_REGION_HK:
+                        regionHKTotalAmt = regionHKTotalAmt.add(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
+                        break;
+                    case HsjcConstant.STOCK_REGION_USA:
+                        regionUSATotalAmt = regionUSATotalAmt.add(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
+                        break;
+                    default:
+                        throw new RuntimeException("错误的地区");
+                }
+
+                //证券种类占比比例
+                switch (stockEntity.getType()) {
+                    case HsjcConstant.STOCK_TYPE_STOCK:
+                        stockTypeStockTotalAmt = stockTypeStockTotalAmt.add(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
+                        break;
+                    case HsjcConstant.STOCK_TYPE_FUND:
+                        stockTypeFundTotalAmt = stockTypeFundTotalAmt.add(stockUserInfoEntity.getCurrentPrice().multiply(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
+                        break;
+                    default:
+                        throw new RuntimeException("错误的类型");
+                }
             }
 
-            //证券种类占比比例
-            switch (stockEntity.getType()) {
-                case HsjcConstant.STOCK_TYPE_STOCK:
-                    stockTypeStockTotalAmt = stockTypeStockTotalAmt.add(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
-                    break;
-                case HsjcConstant.STOCK_TYPE_FUND:
-                    stockTypeFundTotalAmt = stockTypeFundTotalAmt.add(stockUserInfoEntity.getCurrentPrice().subtract(BigDecimal.valueOf(stockUserInfoEntity.getNums())));
-                    break;
-                default:
-                    throw new RuntimeException("错误的类型");
-            }
         }
+        model.setRegionATotalAmt(regionATotalAmt);
+        model.setRegionHKTotalAmt(regionHKTotalAmt);
+        model.setRegionUSATotalAmt(regionUSATotalAmt);
+        model.setStockTypeFundTotalAmt(stockTypeFundTotalAmt);
+        model.setStockTypeStockTotalAmt(stockTypeStockTotalAmt);
+        model.setStockRateModelList(stockRateModelList);
     }
 }

@@ -2,6 +2,7 @@ package com.stevenwan.svlas.dto.stock;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -29,4 +30,30 @@ public class StockStatisticalModel {
      * 证券类型比例
      */
     private List<StockTypeRateModel> stockTypeRateModelList;
+
+    /**
+     * 地区A股
+     */
+    private BigDecimal regionATotalAmt;
+
+    /**
+     * 地区港股
+     */
+    private BigDecimal regionHKTotalAmt;
+
+    /**
+     * 地区美股
+     */
+    private BigDecimal regionUSATotalAmt;
+
+    /**
+     * 类型：股票
+     */
+    private BigDecimal stockTypeStockTotalAmt;
+
+    /**
+     * 类型：基金
+     */
+    private BigDecimal stockTypeFundTotalAmt;
+
 }

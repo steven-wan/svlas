@@ -53,6 +53,12 @@ public class StockStrategyJobDTO {
      */
     private String mailAddress;
 
+
+    /**
+     * 类型 FUND 基金，STOCK 股票，期货，黄金
+     */
+    private String type;
+
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;

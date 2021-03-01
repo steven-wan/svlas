@@ -20,4 +20,8 @@ import org.springframework.stereotype.Service;
 public class StockServiceImpl extends ServiceImpl<StockMapper, StockEntity> implements StockService {
 
 
+    @Override
+    public StockEntity findByCode(String code) {
+        return baseMapper.findByCode(code);
+    }
 }

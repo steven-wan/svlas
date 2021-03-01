@@ -42,7 +42,7 @@ public class StockUserInfoRecordServiceImpl extends ServiceImpl<StockUserInfoRec
     public void updateStockUserInfo(List<TencentStockModel> stockModelList) {
         stockModelList.forEach(tencentStockModel -> {
             //stockUserInfo
-            StockUserInfoEntity stockUserInfoEntity = stockUserInfoService.findByCode(tencentStockModel.getCode());
+            StockUserInfoEntity stockUserInfoEntity = stockUserInfoService.findByCode("%"+tencentStockModel.getCode()+"%");
             stockUserInfoEntity.setCurrentPrice(tencentStockModel.getPrice());
             stockUserInfoEntity.setCreateTime(DateUtil.date());
 

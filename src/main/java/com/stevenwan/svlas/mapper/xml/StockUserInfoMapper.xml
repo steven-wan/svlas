@@ -8,4 +8,19 @@
         code, user_id, cost_price, nums, profit_price, profit_rate, create_time, update_user, update_time
     </sql>
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="stockStockUserInfoResultMap" type="com.stevenwan.svlas.entity.StockUserInfoEntity">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="user_id" property="userId"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="current_price" property="currentPrice"/>
+        <result column="nums" property="nums"/>
+        <result column="profit_price" property="profitPrice"/>
+        <result column="profit_rate" property="profitRate"/>
+    </resultMap>
+
+    <select id="selectStockUserInfo" resultMap="stockStockUserInfoResultMap">
+        select * from stock_user_info where code LIKE #{code}
+    </select>
 </mapper>

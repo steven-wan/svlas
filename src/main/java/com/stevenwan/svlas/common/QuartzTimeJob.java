@@ -50,7 +50,7 @@ public class QuartzTimeJob extends QuartzJobBean {
                 if (index >= 0) {
                     TencentStockModel tencentStockModel = stockModelList.get(index);
                     comparseStockStrategy(tencentStockModel, stockStrategyJobDTO);
-                    ifDownGt10WarnMail(tencentStockModel, stockStrategyJobDTO.getMailAddress());
+                    ifStockPriceDownWarnMail(tencentStockModel, stockStrategyJobDTO.getMailAddress(), stockStrategyJobDTO.getType());
                 }
             });
 
@@ -62,14 +62,20 @@ public class QuartzTimeJob extends QuartzJobBean {
     }
 
 
-    /**
-     * 如果波动大于 10 就发邮件提醒
-     *
-     * @param stockModel
-     */
-    private void ifDownGt10WarnMail(TencentStockModel stockModel, String mailAddress) {
-        if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
-            senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+    private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type) {
+        switch (type) {
+            case HsjcConstant.STOCK_TYPE_FUND:
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
+                    senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+                }
+                break;
+            case HsjcConstant.STOCK_TYPE_STOCK:
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-5)) <= 0) {
+                    senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
+                }
+                break;
+            default:
+                break;
         }
     }
 

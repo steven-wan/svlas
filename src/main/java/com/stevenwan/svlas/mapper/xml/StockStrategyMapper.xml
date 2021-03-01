@@ -18,6 +18,7 @@
         <result column="mail_address" property="mailAddress"/>
         <result column="strategy_type" property="strategyType"/>
         <result column="nums" property="nums"/>
+        <result column="nums" property="nums"/>
     </resultMap>
 
     <select id="selectStockStrategyJobList" resultMap="stockStrategyJobResultMap">
@@ -29,10 +30,12 @@
             ss.price_anchor,
             u.mail_address,
             sus.nums,
-            sus.strategy_type
+            sus.strategy_type,
+            s.type
         FROM stock_strategy ss
                  JOIN stock_user_strategy sus ON sus.strategy_id=ss.id
                  JOIN `user` u ON u.id =sus.user_id
+                 JOIN stock s ON s.`code` = ss.`code`
         WHERE ss.status = 0 and u.id= #{userId}
     </select>
 
