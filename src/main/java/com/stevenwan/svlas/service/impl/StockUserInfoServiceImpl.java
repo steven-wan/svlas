@@ -116,7 +116,7 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
         //基金
         StockTypeRateModel fundModel = new StockTypeRateModel();
         fundModel.setStockTypeName("基金");
-        stockModel.setRate(stockTypeFundTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt), mathContext));
+        fundModel.setRate(stockTypeFundTotalAmt.divide(stockTypeStockTotalAmt.add(stockTypeFundTotalAmt), mathContext));
         stockTypeRateModelList.add(fundModel);
 
         model.setStockTypeRateModelList(stockTypeRateModelList);
