@@ -29,7 +29,6 @@ public class StockStrategyController {
      * @return
      */
     @PostMapping("/addStockStrategy")
-    @ResponseBody
     public Boolean addStockStrategy(@RequestBody StockUserStrategyDTO stockUserStrategyDTO) {
         return stockUserStrategyService.saveUserStrategy(stockUserStrategyDTO);
     }

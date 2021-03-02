@@ -8,7 +8,6 @@ import com.stevenwan.svlas.dto.stock.StockStrategyJobDTO;
 import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.StockStrategyEntity;
 import com.stevenwan.svlas.service.StockStrategyService;
-import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
 import org.quartz.JobExecutionContext;
@@ -31,9 +30,6 @@ public class QuartzTimeJob extends QuartzJobBean {
 
     @Autowired
     private StockConfig stockConfig;
-
-    @Autowired
-    private StockUserInfoRecordService stockUserInfoRecordService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -100,11 +96,11 @@ public class QuartzTimeJob extends QuartzJobBean {
     }
 
     private void sendGoodMails(String mailAddress) {
-        MailUtil.send(mailAddress, "股票每日一句", "不要担心踏空，严格按照加仓策略，回过头看不遵守策略，纪律的操作 99% 都是错的，不动持有2年以上都会赚钱。", false);
+        MailUtil.send(mailAddress, "股票每日一句", "确定性，好公司，低估值，合理价格，慢慢变富", false);
     }
 
     private void sendWarnMails(String mailAddress, String codeName, BigDecimal price) {
-        String content = "股票【加仓】和【买点】提醒：" + codeName + "当前价格为：" + price + "\\r\\n";
+        String content = "股票【加仓】和【买点】提醒：" + codeName + "当前价格为：" + price;
         MailUtil.send(mailAddress, "股票加仓和买点提醒", content, false);
     }
 }
