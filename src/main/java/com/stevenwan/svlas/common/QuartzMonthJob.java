@@ -45,7 +45,7 @@ public class QuartzMonthJob extends QuartzJobBean {
         for (FundAutoPlanModel obj : fundAutoPlanEntityList) {
             content = content + "<tr><td>" + obj.getCodeName() + "</td> <td>" + obj.getPrice() + "</td></tr>";
         }
-        String tail = "</table><a href=\"http://dev.jbf.aijk.net:8484/stock/getStockRate?userId=" + userId + "\">股票整体统计</a></body></html>";
+        String tail = "</table><a href=\"http://dev.jbf.aijk.net/svlas/stock/getStockRate?userId=" + userId + "\">股票整体统计</a></body></html>";
 
         MailUtil.send(userEntity.getMailAddress(), "股票定投提醒", content + tail, true);
     }

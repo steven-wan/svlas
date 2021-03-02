@@ -1,5 +1,7 @@
 server:
   port: 8484
+  servlet:
+    context-path: /svlas
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
