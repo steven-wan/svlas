@@ -96,7 +96,7 @@ public class QuartzTimeJob extends QuartzJobBean {
     }
 
     private void sendGoodMails(String mailAddress) {
-        MailUtil.send(mailAddress, "股票每日一句", "确定性，好公司，低估值，合理价格，慢慢变富", false);
+        MailUtil.send(mailAddress, "股票每日一句", "确定性:好公司，合理价格,慢慢变富", false);
     }
 
     private void sendWarnMails(String mailAddress, String codeName, BigDecimal price) {

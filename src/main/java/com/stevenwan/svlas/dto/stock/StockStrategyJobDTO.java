@@ -63,7 +63,7 @@ public class StockStrategyJobDTO {
     public boolean equals(Object o) {
         if (o == null) return false;
         TencentStockModel that = (TencentStockModel) o;
-        return Objects.equals(code, that.getCode());
+        return Objects.equals(code.substring(2), that.getCode());
     }
 
     @Override

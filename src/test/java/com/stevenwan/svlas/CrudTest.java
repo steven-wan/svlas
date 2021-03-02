@@ -59,7 +59,7 @@ public class CrudTest {
 
         if (CollectionUtil.isNotEmpty(strategyJobDTOList)) {
             String codeList = strategyJobDTOList.stream().map(stockStrategyJobDTO -> "s_".concat(stockStrategyJobDTO.getCode())).collect(Collectors.joining(","));
-            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData("https://qt.gtimg.cn/?q=s_", codeList);
+            List<TencentStockModel> stockModelList = StockUtils.tencentTimeData("https://qt.gtimg.cn/?q=", codeList);
 
             strategyJobDTOList.forEach(stockStrategyJobDTO -> {
                 int index = stockModelList.indexOf(stockStrategyJobDTO);
