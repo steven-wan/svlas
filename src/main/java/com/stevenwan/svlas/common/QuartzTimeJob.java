@@ -61,12 +61,12 @@ public class QuartzTimeJob extends QuartzJobBean {
     private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type) {
         switch (type) {
             case HsjcConstant.STOCK_TYPE_FUND:
-                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-4)) <= 0) {
                     senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
                 }
                 break;
             case HsjcConstant.STOCK_TYPE_STOCK:
-                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-5)) <= 0) {
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-9)) <= 0) {
                     senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
                 }
                 break;
