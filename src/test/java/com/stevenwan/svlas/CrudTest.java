@@ -135,7 +135,7 @@ public class CrudTest {
     }
 
     private void sendWarnMails(String mailAddress, String codeName, BigDecimal price) {
-        String content = "股票【加仓】和【买点】提醒：" + codeName + "当前价格为：" + price + "\\r\\n";
+        String content = "股票【加仓】和【买点】提醒：" + codeName + " 当前价格为：" + price;
         MailUtil.send(mailAddress, "股票加仓和买点提醒", content, false);
     }
 
