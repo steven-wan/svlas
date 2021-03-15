@@ -52,5 +52,9 @@ public class PersonStockTradeFlowEntity extends BaseEntity {
      */
     private Date tradeTime;
 
+    /**
+     * 操作类型 int 1 买 0 卖
+     */
+    private Integer opeType;
 
 }

@@ -10,6 +10,7 @@ import com.stevenwan.svlas.entity.StockStrategyEntity;
 import com.stevenwan.svlas.service.StockStrategyService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @desc
  * @date 2021-02-23 16:40
  */
+@Slf4j
 public class QuartzTimeJob extends QuartzJobBean {
     @Autowired
     private StockStrategyService stockStrategyService;
@@ -61,7 +63,7 @@ public class QuartzTimeJob extends QuartzJobBean {
     private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type) {
         switch (type) {
             case HsjcConstant.STOCK_TYPE_FUND:
-                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-4)) <= 0) {
+                if (stockModel.getPerPriceVolatility().compareTo(new BigDecimal(-3.5)) <= 0) {
                     senddownWarnMails(mailAddress, stockModel.getCodeName(), stockModel.getPrice(), stockModel.getPerPriceVolatility());
                 }
                 break;

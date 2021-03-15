@@ -56,6 +56,7 @@ CREATE TABLE `person_stock_trade_flow`
     `nums`       int(10)        DEFAULT NULL COMMENT '交易股数',
     `volume`     varchar(100)   DEFAULT NULL COMMENT '交易原因',
     `trade_time` datetime       DEFAULT NULL COMMENT '交易日期',
+    `ope_type`       int(1)        DEFAULT NULL COMMENT '操作类型 int 1 买 0 卖',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='个人股票交易记录流水';

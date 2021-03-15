@@ -1,5 +1,6 @@
 package com.stevenwan.svlas.service;
 
+import com.stevenwan.svlas.dto.stock.PersonStockTradeFlowAddDTO;
 import com.stevenwan.svlas.entity.PersonStockTradeFlowEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PersonStockTradeFlowService extends IService<PersonStockTradeFlowEntity> {
 
+    /**
+     * 新增个人交易流水以及更新股票持仓信息
+     * @param personStockTradeFlowAddDTO
+     * @return
+     */
+    Boolean addTradeFlowAndUpdateStockUserInfo(PersonStockTradeFlowAddDTO personStockTradeFlowAddDTO);
 }

@@ -1,13 +1,15 @@
 package com.stevenwan.svlas.controller;
 
 
-import cn.hutool.core.date.DateUtil;
 import com.stevenwan.svlas.dto.stock.PersonStockTradeFlowAddDTO;
-import com.stevenwan.svlas.entity.PersonStockTradeFlowEntity;
 import com.stevenwan.svlas.service.PersonStockTradeFlowService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -26,16 +28,16 @@ public class PersonStockTradeFlowController {
 
     /**
      * 添加个人股票交易成交记录
+     *
      * @param personStockTradeFlowAddDTO
      * @return
      */
     @PostMapping("/addTradeFlow")
-    @ResponseBody
-    public Boolean addTradeFlow(@RequestBody PersonStockTradeFlowAddDTO personStockTradeFlowAddDTO) {
-        PersonStockTradeFlowEntity entity = new PersonStockTradeFlowEntity();
-        BeanUtils.copyProperties(personStockTradeFlowAddDTO, entity);
-        entity.setTradeTime(DateUtil.date());
-        return personStockTradeFlowService.save(entity);
+    public Boolean addTradeFlow(@Validated @RequestBody PersonStockTradeFlowAddDTO personStockTradeFlowAddDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+        }
+        return personStockTradeFlowService.addTradeFlowAndUpdateStockUserInfo(personStockTradeFlowAddDTO);
     }
 }
 
