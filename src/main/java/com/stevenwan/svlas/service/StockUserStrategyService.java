@@ -22,4 +22,10 @@ public interface StockUserStrategyService extends IService<StockUserStrategyEnti
      */
     Boolean saveUserStrategy(StockUserStrategyDTO userStrategyDTO);
 
+    /**
+     * 删除用户的股票策略
+     * @param id
+     * @return
+     */
+    Boolean deleteStockStrategy(Long id);
 }

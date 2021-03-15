@@ -2,15 +2,15 @@ package com.stevenwan.svlas.controller;
 
 
 import cn.hutool.core.date.DateUtil;
+import com.stevenwan.svlas.dto.stock.StockUserInUpdateDTO;
 import com.stevenwan.svlas.dto.stock.StockUserInfoAddDTO;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
-import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
-import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.StockUserInfoService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.BeanUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,31 +28,28 @@ public class StockUserInfoController {
 
     private final StockUserInfoService stockUserInfoService;
 
-
-    private final StockUserInfoRecordService stockUserInfoRecordService;
-
     @PostMapping("/addStockUserInfo")
-    @ResponseBody
-    public Boolean addStockUserInfo(@RequestBody StockUserInfoAddDTO stockUserInfoAddDTO) {
-        StockUserInfoEntity entity = new StockUserInfoEntity();
-        BeanUtils.copyProperties(stockUserInfoAddDTO, entity);
-        entity.setCreateTime(DateUtil.date());
-        entity.setUpdateTime(DateUtil.date());
-        stockUserInfoService.save(entity);
-
-        StockUserInfoRecordEntity recordEntity = new StockUserInfoRecordEntity();
-        BeanUtils.copyProperties(entity, recordEntity, new String[]{"id"});
-
-        return stockUserInfoRecordService.save(recordEntity);
+    public Boolean addStockUserInfo(@RequestBody @Validated StockUserInfoAddDTO stockUserInfoAddDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+        }
+        return stockUserInfoService.saveStockUserInfoAndRecord(stockUserInfoAddDTO);
     }
 
     @GetMapping("/deleteStockUserInfo")
-    @ResponseBody
     public Boolean deleteStockUserInfo(@Param("id") Long id) {
         StockUserInfoEntity entity = stockUserInfoService.getById(id);
         ObjectUtils.isNullThrowsExcetion(entity, "错误的 id");
         entity.setUpdateTime(DateUtil.date());
         return stockUserInfoService.removeById(entity);
+    }
+
+    @PostMapping("/updateStockUserInfo")
+    public Boolean updateStockUserInfo(@RequestBody @Validated StockUserInUpdateDTO userInUpdateDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+        }
+        return stockUserInfoService.updateStockUserInfo(userInUpdateDTO.getCostPrice(), userInUpdateDTO.getNums(), userInUpdateDTO.getId());
     }
 }
 

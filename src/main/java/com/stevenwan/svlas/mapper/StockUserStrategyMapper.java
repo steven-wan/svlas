@@ -1,7 +1,9 @@
 package com.stevenwan.svlas.mapper;
 
-import com.stevenwan.svlas.entity.StockUserStrategyEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.entity.StockUserStrategyEntity;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface StockUserStrategyMapper extends BaseMapper<StockUserStrategyEntity> {
 
+    @Select("select * from stock_user_strategy where strategy_id=#{strategyId}")
+    StockUserStrategyEntity selectByStrategyId(@Param("strategyId") Long strategyId);
 }

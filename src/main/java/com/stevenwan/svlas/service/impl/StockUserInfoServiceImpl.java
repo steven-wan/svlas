@@ -1,6 +1,7 @@
 package com.stevenwan.svlas.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.mail.MailUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +10,7 @@ import com.stevenwan.svlas.config.StockConfig;
 import com.stevenwan.svlas.dto.stock.*;
 import com.stevenwan.svlas.entity.StockEntity;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
+import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
 import com.stevenwan.svlas.entity.UserEntity;
 import com.stevenwan.svlas.mapper.StockUserInfoMapper;
 import com.stevenwan.svlas.service.StockService;
@@ -17,8 +19,10 @@ import com.stevenwan.svlas.service.StockUserInfoService;
 import com.stevenwan.svlas.service.UserService;
 import com.stevenwan.svlas.util.ObjectUtils;
 import com.stevenwan.svlas.util.StockUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -79,6 +83,37 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
         }
 
         sendMailsStockAllStatistical(model, userId);
+    }
+
+    @Override
+    @Transactional
+    public Boolean saveStockUserInfoAndRecord(StockUserInfoAddDTO stockUserInfoAddDTO) {
+        StockUserInfoEntity entity = new StockUserInfoEntity();
+        BeanUtils.copyProperties(stockUserInfoAddDTO, entity);
+        entity.setCreateTime(DateUtil.date());
+        entity.setUpdateTime(DateUtil.date());
+        save(entity);
+
+        StockUserInfoRecordEntity recordEntity = new StockUserInfoRecordEntity();
+        BeanUtils.copyProperties(entity, recordEntity, new String[]{"id"});
+        return stockUserInfoRecordService.save(recordEntity);
+    }
+
+    @Override
+    @Transactional
+    public Boolean updateStockUserInfo(BigDecimal costPrice, Integer nums, Long id) {
+        StockUserInfoEntity stockUserInfoEntity = getById(id);
+        ObjectUtils.isNullThrowsExcetion(stockUserInfoEntity, "错误的 id");
+
+        stockUserInfoEntity.setCostPrice(costPrice);
+        stockUserInfoEntity.setNums(nums);
+        stockUserInfoEntity.setUpdateTime(DateUtil.date());
+        updateById(stockUserInfoEntity);
+
+        StockUserInfoRecordEntity recordEntity = new StockUserInfoRecordEntity();
+        BeanUtils.copyProperties(stockUserInfoEntity, recordEntity, new String[]{"id"});
+        recordEntity.setCreateTime(DateUtil.date());
+        return stockUserInfoRecordService.save(recordEntity);
     }
 
     private void sendMailsStockAllStatistical(StockStatisticalModel model, Long userId) {

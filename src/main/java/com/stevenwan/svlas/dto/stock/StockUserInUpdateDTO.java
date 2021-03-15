@@ -2,28 +2,21 @@ package com.stevenwan.svlas.dto.stock;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
  * @author steven-wan
  * @desc
- * @date 2021-02-26 10:17
+ * @date 2021-03-15 11:11
  */
 @Data
-public class StockUserInfoAddDTO {
+public class StockUserInUpdateDTO {
     /**
-     * 股票代码
+     * ID
      */
-    @NotBlank(message = "code is null")
-    private String code;
-
-    /**
-     * 用户ID
-     */
-    @NotNull(message = "userId is null")
-    private Long userId;
+    @NotNull(message = "id is null")
+    private Long id;
 
     /**
      * 成本价
@@ -37,5 +30,4 @@ public class StockUserInfoAddDTO {
      */
     @NotNull(message = "nums is null")
     private Integer nums;
-
 }

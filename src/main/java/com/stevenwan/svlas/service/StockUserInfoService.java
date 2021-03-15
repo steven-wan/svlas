@@ -1,7 +1,10 @@
 package com.stevenwan.svlas.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.stevenwan.svlas.dto.stock.StockUserInfoAddDTO;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
+
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -29,4 +32,20 @@ public interface StockUserInfoService extends IService<StockUserInfoEntity> {
      * @return
      */
     void getStockUserInfo(Long userId);
+
+    /**
+     * 新增股票持仓以及记录
+     * @param stockUserInfoAddDTO
+     * @return
+     */
+    Boolean saveStockUserInfoAndRecord(StockUserInfoAddDTO stockUserInfoAddDTO);
+
+    /**
+     * 更新股票持仓以及记录
+     * @param costPrice
+     * @param nums
+     * @param id
+     * @return
+     */
+    Boolean updateStockUserInfo(BigDecimal costPrice, Integer nums, Long id);
 }

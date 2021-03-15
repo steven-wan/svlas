@@ -11,6 +11,7 @@ import com.stevenwan.svlas.mapper.StockUserStrategyMapper;
 import com.stevenwan.svlas.service.StockStrategyService;
 import com.stevenwan.svlas.service.StockUserStrategyRecordService;
 import com.stevenwan.svlas.service.StockUserStrategyService;
+import com.stevenwan.svlas.util.ObjectUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,17 @@ public class StockUserStrategyServiceImpl extends ServiceImpl<StockUserStrategyM
         BeanUtils.copyProperties(userStrategyEntity, recordEntity, new String[]{"id"});
 
         return strategyRecordService.save(recordEntity);
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteStockStrategy(Long id) {
+        StockStrategyEntity stockStrategyEntity = strategyService.getById(id);
+        ObjectUtils.isNullThrowsExcetion(stockStrategyEntity, "错误的 ID");
+
+        StockUserStrategyEntity userStrategyEntity = baseMapper.selectByStrategyId(stockStrategyEntity.getId());
+        strategyService.removeById(stockStrategyEntity.getId());
+        return removeById(userStrategyEntity.getId());
     }
 
 }

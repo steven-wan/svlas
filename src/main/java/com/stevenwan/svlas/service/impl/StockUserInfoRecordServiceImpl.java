@@ -3,6 +3,7 @@ package com.stevenwan.svlas.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.stevenwan.svlas.dto.stock.StockUserInfoAddDTO;
 import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import com.stevenwan.svlas.entity.StockUserInfoRecordEntity;
@@ -10,6 +11,7 @@ import com.stevenwan.svlas.mapper.StockUserInfoRecordMapper;
 import com.stevenwan.svlas.service.StockUserInfoRecordService;
 import com.stevenwan.svlas.service.StockUserInfoService;
 import com.stevenwan.svlas.util.ObjectUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,4 +61,6 @@ public class StockUserInfoRecordServiceImpl extends ServiceImpl<StockUserInfoRec
             saveOrUpdate(stockUserInfoRecordEntity);
         });
     }
+
+
 }
