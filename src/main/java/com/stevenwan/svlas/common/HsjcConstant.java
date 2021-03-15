@@ -45,7 +45,7 @@ public class HsjcConstant {
     /**
      * 触发器类型： 0 - simple  1 - cron
      */
-    public static  Integer TRIGGER_TYPE_CRON = 1;
+    public static Integer TRIGGER_TYPE_CRON = 1;
 
 
     /**
@@ -128,4 +128,15 @@ public class HsjcConstant {
      * 状态： 0 - 代表正在执行  1 - 已停止
      */
     public static Integer FUND_AUTO_PLAN_STATUS_STOP = 1;
+
+    /**
+     *股票策略类型： 1 买点(加仓)，0 卖出
+     */
+    public static Integer STRATEGY_TYPE_BUY = 1;
+
+    /**
+     * 股票策略类型： 1 买点(加仓)，0 卖出
+     */
+    public static Integer STRATEGY_TYPE_SELL = 0;
+
 }

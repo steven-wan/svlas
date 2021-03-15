@@ -2,9 +2,11 @@ package com.stevenwan.svlas.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.stevenwan.svlas.dto.stock.StockUserInfoAddDTO;
+import com.stevenwan.svlas.dto.stock.StockUserInfoJobDTO;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -48,4 +50,11 @@ public interface StockUserInfoService extends IService<StockUserInfoEntity> {
      * @return
      */
     Boolean updateStockUserInfo(BigDecimal costPrice, Integer nums, Long id);
+
+    /**
+     * 根据用户查询它的持仓股票
+     * @param userId
+     * @return
+     */
+    List<StockUserInfoJobDTO> selectStockUserInfoJobList(Long userId);
 }

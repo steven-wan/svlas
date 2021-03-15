@@ -3,7 +3,10 @@ package com.stevenwan.svlas.entity;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
+import java.util.Objects;
+
 import com.stevenwan.svlas.common.BaseEntity;
+import com.stevenwan.svlas.dto.stock.TencentStockModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,7 +28,7 @@ public class StockUserInfoEntity extends BaseEntity {
     /**
      * 股票代码
      */
-    private String code;
+    protected String code;
 
     /**
      * 用户ID
@@ -67,6 +70,5 @@ public class StockUserInfoEntity extends BaseEntity {
      * 修改时间
      */
     private Date updateTime;
-
 
 }

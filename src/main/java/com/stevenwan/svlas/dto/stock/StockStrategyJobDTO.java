@@ -48,11 +48,6 @@ public class StockStrategyJobDTO {
      */
     private Integer nums;
 
-    /**
-     * 邮件地址
-     */
-    private String mailAddress;
-
 
     /**
      * 类型 FUND 基金，STOCK 股票，期货，黄金

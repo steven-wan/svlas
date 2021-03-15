@@ -116,6 +116,11 @@ public class StockUserInfoServiceImpl extends ServiceImpl<StockUserInfoMapper, S
         return stockUserInfoRecordService.save(recordEntity);
     }
 
+    @Override
+    public List<StockUserInfoJobDTO> selectStockUserInfoJobList(Long userId) {
+        return baseMapper.selectStockUserInfoJobList(userId);
+    }
+
     private void sendMailsStockAllStatistical(StockStatisticalModel model, Long userId) {
         UserEntity userEntity = userService.getById(Long.valueOf(userId));
 

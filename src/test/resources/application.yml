@@ -1,0 +1,58 @@
+server:
+  port: 8484
+  servlet:
+    context-path: /svlas
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://61.164.39.69:41523/stock_steven_wan_dev?useUnicode=true&useSSL=false&characterEncoding=utf8
+    username: root
+    password: jbF2019_13006
+  redis:
+    host: 172.16.104.91
+    port: 6379
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: NEVER
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: MyQuartzScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: false
+            clusterCheckinInterval: 10000
+            useProperties: true
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 3
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+
+
+##������վ
+stock:
+  netease-history-url: http://quotes.money.163.com/service/chddata.html?code=CODE&start=START&end=END&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP
+  tencent-time-url: https://qt.gtimg.cn/?q=
+
+
+
+applet:
+  app-id: wxbe9e0aa2e7c5d9de
+  app-secret: 43736aeda62fff1fa81bdab84c32cc94
+
+mybatis-plus:
+  mapper-locations: classpath*:com/stevenwan/svlas/mapper/xml/*Mapper.xml
+
+
+sms:
+  sendUrl: http://api.hspaas.cn:8080/sms/send
+  balanceUrl: http://api.hspaas.cn:8080/sms/balance
+  appkey: hsENTvhCOwZNs
+  password: e81c73f5ecbf38bc6e297a73a2fc377b
+  content: 【联兴云医】您的验证码为xxxx，如非本人发送请忽略。

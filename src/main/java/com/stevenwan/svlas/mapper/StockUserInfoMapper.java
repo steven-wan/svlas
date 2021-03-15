@@ -1,6 +1,7 @@
 package com.stevenwan.svlas.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stevenwan.svlas.dto.stock.StockUserInfoJobDTO;
 import com.stevenwan.svlas.entity.StockUserInfoEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -20,4 +21,6 @@ public interface StockUserInfoMapper extends BaseMapper<StockUserInfoEntity> {
 
     @Select("select * from stock_user_info where user_id=#{userId} ")
     List<StockUserInfoEntity> findByUserId(@Param("userId") Long userId);
+
+    List<StockUserInfoJobDTO> selectStockUserInfoJobList(Long userId);
 }

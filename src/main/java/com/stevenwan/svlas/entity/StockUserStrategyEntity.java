@@ -28,7 +28,7 @@ public class StockUserStrategyEntity extends BaseEntity {
     private Long userId;
 
     /**
-     * 策略类型 买点，卖出，加仓
+     * 1 买点(加仓)，0 卖出
      */
     private Integer strategyType;
 

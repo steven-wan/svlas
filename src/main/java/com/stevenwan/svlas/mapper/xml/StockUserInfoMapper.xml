@@ -21,6 +21,29 @@
     </resultMap>
 
     <select id="selectStockUserInfo" resultMap="stockStockUserInfoResultMap">
-        select * from stock_user_info where code LIKE #{code}
+        select *
+        from stock_user_info
+        where code LIKE #{code}
+    </select>
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="stockUserInfoJobResultMap" type="com.stevenwan.svlas.dto.stock.StockUserInfoJobDTO">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="nums" property="nums"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <select id="selectStockUserInfoJobList" resultMap="stockUserInfoJobResultMap">
+        SELECT su.id,
+               su.`code`,
+               su.cost_price,
+               su.nums,
+               s.type
+        FROM stock_user_info su
+                 JOIN stock s ON s.`code` = su.`code`
+        WHERE su.user_id = #{userId}
     </select>
 </mapper>
