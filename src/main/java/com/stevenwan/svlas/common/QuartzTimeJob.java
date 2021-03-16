@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,13 +74,15 @@ public class QuartzTimeJob extends QuartzJobBean {
     private void stockUserInfoQuery(String userId, String mailAddress) {
         List<StockUserInfoJobDTO> userInfoEntityList = stockUserInfoService.selectStockUserInfoJobList(Long.valueOf(userId));
         if (CollectionUtil.isNotEmpty(userInfoEntityList)) {
+            MathContext mathContext = new MathContext(2);
+
             String codeList = userInfoEntityList.stream().map(stockUserInfoEntity -> "s_".concat(stockUserInfoEntity.getCode())).collect(Collectors.joining(","));
             List<TencentStockModel> stockModelList = StockUtils.tencentTimeData(stockConfig.getTencentTimeUrl(), codeList);
             userInfoEntityList.forEach(stockUserInfoEntity -> {
                 int index = stockModelList.indexOf(stockUserInfoEntity);
                 if (index >= 0) {
                     TencentStockModel tencentStockModel = stockModelList.get(index);
-                    ifStockPriceDownWarnMail(tencentStockModel, mailAddress, stockUserInfoEntity.getType(), stockUserInfoEntity.getCostPrice());
+                    ifStockPriceDownWarnMail(tencentStockModel, mailAddress, stockUserInfoEntity.getType(), stockUserInfoEntity.getCostPrice(),mathContext);
                 }
             });
         }
@@ -103,9 +106,9 @@ public class QuartzTimeJob extends QuartzJobBean {
     }
 
 
-    private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type, BigDecimal costPrice) {
+    private void ifStockPriceDownWarnMail(TencentStockModel stockModel, String mailAddress, String type, BigDecimal costPrice,MathContext mathContext) {
         BigDecimal currentPrice = stockModel.getPrice();
-        BigDecimal totalPriceDownVolatility = (costPrice.subtract(currentPrice)).divide(costPrice);
+        BigDecimal totalPriceDownVolatility = (costPrice.subtract(currentPrice)).divide(costPrice, mathContext).multiply(new BigDecimal(100));
 
         switch (type) {
             case HsjcConstant.STOCK_TYPE_FUND:
