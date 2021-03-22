@@ -140,6 +140,7 @@ public class QuartzSchedulerJobsServiceImpl extends ServiceImpl<QuartzSchedulerJ
         QuartzSchedulerJobsEntity jobsMonthEntity = new QuartzSchedulerJobsEntity();
         BeanUtil.copyProperties(quartzAddMonthJobDTO, jobsMonthEntity, new String[]{"id"});
         jobsMonthEntity.setCreateTime(DateUtil.date());
+        jobsMonthEntity.setTriggerType(HsjcConstant.TRIGGER_TYPE_CRON);
         jobsMonthEntity.setCreateUser(quartzAddMonthJobDTO.getUserId());
         jobsMonthEntity.setStatus(HsjcConstant.JOB_STATUS_EXCUTING);
         save(jobsMonthEntity);
